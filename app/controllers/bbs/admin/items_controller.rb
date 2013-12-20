@@ -26,19 +26,13 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
     page  = (params[:page] || 1).to_i
     limit = 10
 
-    doc = nil
-    10.times do
+    item = Bbs::Item.new.public
+    item.and :content_id, @content.id
+    item.and :parent_id, 0
+    item.page params[:page], limit
+    @threads = item.find(:all, :order => 'id DESC')
 
-    res = Util::Http::Request.send("#{@node_uri}index.xml?page=#{page}&limit=#{limit}")
-    doc = REXML::Document.new(res.body)
-
-    break if res.status == 200 # if doc.root
-    end
-
-    return render(:text => "投稿データの取得に失敗しました。", :layout => true) unless doc.root
-
-    @items = doc.root
-    total = doc.root.elements["total_entries"].text.to_i
+    total = @threads.total_entries
 
     @pagination = Util::Html::SimplePagination.new
     @pagination.prev_label = "前のページ"
