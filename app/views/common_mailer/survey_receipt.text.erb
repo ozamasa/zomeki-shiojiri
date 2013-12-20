@@ -2,4 +2,4 @@
 
   次のURLをクリックして回答を確認してください。
 
-  <%= survey_form_form_answers_url(content: @form_answer.form.content, form_id: @form_answer.form.id) %>
+  <%= "#{Core.full_uri.chop}#{survey_form_form_answers_path(content: @form_answer.form.content, form_id: @form_answer.form.id)}" %>
