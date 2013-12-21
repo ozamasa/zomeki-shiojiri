@@ -7,29 +7,32 @@
     <th style="width: 25%;">投稿者名</th>
     <th style="width: 120px; text-align: center;">IPアドレス</th>
     <th style="width: 120px; text-align: center;">投稿日時</th>
+    <th style="width: 60px; text-align: center;">状態</th>
   </tr>
 
   <% @threads.each_with_index do |thread, idx| %>
-  <% thread_id = thread["id"] %>
+  <% thread_id = thread.id %>
   <tr class="<%= cycle '', 'cycle' %>">
     <td style="text-align: center;"><%= link_to :show, url_for(:action => :show, :id => thread_id) %></td>
     <td style="text-align: center;">スレッド</td>
     <td style="text-align: right;"><%= thread_id %></td>
-    <td><%= truncate(thread["title"], :length => 30) %></td>
-    <td><%= truncate(thread["name"], :length => 20) %></td>
-    <td><%= thread["ipaddr"] %></td>
-    <td style="text-align: center;"><%= thread["created_at"].to_s.gsub(/(.*):.*/, '\1') %></td>
+    <td><%= truncate(thread.title, :length => 30) %></td>
+    <td><%= truncate(thread.name, :length => 20) %></td>
+    <td><%= thread.ipaddr %></td>
+    <td style="text-align: center;"><%= thread.created_at.to_s.gsub(/(.*):.*/, '\1') %></td>
+    <td style="text-align: center;"><%= thread.status.name %></td>
   </tr>
   <% thread.all_responses.each do |res| %>
-  <% res_id = res["id"] %>
+  <% res_id = res.id %>
   <tr class="<%= cycle '', 'cycle' %>">
     <td style="text-align: center;"><%= link_to :show, url_for(:action => :show, :id => "#{thread_id}-#{res_id}") %></td>
     <td style="text-align: center;">レス</td>
     <td style="text-align: right;"><%= res_id %></td>
-    <td><%= truncate(res["title"], :length => 30) %></td>
-    <td><%= truncate(res["name"], :length => 20) %></td>
-    <td><%= res["ipaddr"] %></td>
-    <td style="text-align: center;"><%= res["created_at"].to_s.gsub(/(.*):.*/, '\1') %></td>
+    <td><%= truncate(res.title, :length => 30) %></td>
+    <td><%= truncate(res.name, :length => 20) %></td>
+    <td><%= res.ipaddr %></td>
+    <td style="text-align: center;"><%= res.created_at.to_s.gsub(/(.*):.*/, '\1') %></td>
+    <td style="text-align: center;"><%= res.status.name %></td>
   </tr>
   <% end %>
   <% end %>

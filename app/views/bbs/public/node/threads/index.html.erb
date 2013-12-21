@@ -27,7 +27,7 @@
   <div class="thread">
     <div class="answerLink"><%= link_to "返信", "#{@node_uri}#{item.id}/?#{query}#resForm" %></div>
     <div class="threadItem"><%= render :partial => "item", :locals => {:item => item} %></div>
-    <% item.all_responses.each do |res| %>
+    <% item.public_responses.each do |res| %>
     <div class="resItem"><%= render :partial => "item", :locals => {:item => res} %></div>
     <% end %>
   </div>

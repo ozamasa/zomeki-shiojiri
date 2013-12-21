@@ -13,7 +13,7 @@
     <body><%= item.body %></body>
     <ipaddr><%= item.ipaddr %></ipaddr>
     <user_agent><%= item.user_agent %></user_agent>
-    <% item.all_responses.each do |res| %>
+    <% item.public_responses.each do |res| %>
     <item>
       <id><%= res.id %></id>
       <thread_id><%= res.thread_id %></thread_id>

@@ -5,7 +5,7 @@
 <div class="threads">
   <div class="thread">
     <div class="threadItem"><%= render :partial => "item", :locals => {:item => @thread} %></div>
-    <% @thread.all_responses.each do |res| %>
+    <% @thread.public_responses.each do |res| %>
     <div class="resItem"><%= render :partial => "item", :locals => {:item => res} %></div>
     <% end %>
   </div>

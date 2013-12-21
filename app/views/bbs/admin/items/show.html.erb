@@ -1,37 +1,46 @@
 <table class="show">
   <tr>
     <th>投稿No.</th>
-    <td><%= @item.elements["id"].text %></td>
+    <td><%= @item.id %></td>
   </tr>
     <th>投稿日時</th>
-    <td><%= @item.elements["created_at"].text %></td>
+    <td><%= @item.created_at %></td>
   </tr><tr>
     <th>投稿者名</th>
-    <td><%= @item.elements["name"].text %></td>
+    <td><%= @item.name %></td>
   </tr><tr>
     <th>タイトル</th>
-    <td><%= @item.elements["title"].text %></td>
+    <td><%= @item.title %></td>
   </tr><tr>
     <th>本文</th>
-    <td><%=hbr @item.elements["body"].text.gsub(/([^ ]{120})/, "\\1 ") %></td>
+    <td><%=hbr @item.body.gsub(/([^ ]{120})/, "\\1 ") %></td>
   </tr>
-  <% if !@item.elements["email"].text.blank? %>
+  <% unless @item.email.blank? %>
   <tr>
     <th>Email</th>
-    <td><%= @item.elements["email"].text %></td>
+    <td><%= @item.email %></td>
   </tr>
   <% end %>
-  <% if !@item.elements["uri"].text.blank? %>
+  <% unless @item.uri.blank? %>
   <tr>
     <th>URL</th>
-    <td><%= @item.elements["uri"].text %></td>
+    <td><%= @item.uri %></td>
   </tr>
   <% end %>
   <tr>
     <th>IPアドレス</th>
-    <td><%= @item.elements["ipaddr"].text %></td>
-  </tr><tr>
+    <td><%= @item.ipaddr %></td>
+  </tr>
+  <tr>
     <th>ユーザエージェント</th>
-    <td><%= @item.elements["user_agent"].text %></td>
+    <td><%= @item.user_agent %></td>
+  </tr>
+  <tr>
+    <th>状態</th>
+    <td><%= @item.status.name %></td>
   </tr>
 </table>
+
+<%= form_for(:item, :html => {:method => :put}) do |f| %>
+<%= submit @item.state_options %>
+<% end %>

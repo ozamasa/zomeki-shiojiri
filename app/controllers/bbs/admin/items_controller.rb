@@ -26,7 +26,7 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
     page  = (params[:page] || 1).to_i
     limit = 10
 
-    item = Bbs::Item.new.public
+    item = Bbs::Item.new
     item.and :content_id, @content.id
     item.and :parent_id, 0
     item.page params[:page], limit
@@ -48,20 +48,7 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
       @thread_id, @res_id = params[:id].split("-")
     end
 
-    res = Util::Http::Request.send("#{@node_uri}#{@thread_id}/index.xml")
-    doc = REXML::Document.new(res.body)
-    return render(:text => "投稿データの取得に失敗しました。", :layout => true) unless doc.root
-
-    if @res_id == nil
-      @item = doc.root.elements["item"]
-    else
-      doc.root.elements["item"].elements.each("item") do |res|
-        if @res_id == res.elements["id"].text
-          @item = res
-          break
-        end
-      end
-    end
+    @item = bbs_item
 
     return http_error(404) unless @item
   end
@@ -75,7 +62,11 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
   end
 
   def update
-    return error_auth
+    @item = bbs_item
+    @item.update_attribute(:state, :public) if params[:commit_public].present?
+    @item.update_attribute(:state, :closed) if params[:commit_closed].present?
+
+    render :action => :show
   end
 
   def destroy
@@ -92,6 +83,30 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
       flash.now[:notice] = '削除処理に失敗しました。'
       show
       render :action => :show
+    end
+  end
+
+  def bbs_item
+    @thread_id = params[:id]
+    @res_id    = nil
+    if params[:id] =~ /\-/
+      @thread_id, @res_id = params[:id].split("-")
+    end
+
+    item = Bbs::Item.new
+    item.and :content_id, @content.id
+    item.and :parent_id, 0
+    item.and :thread_id, @thread_id
+    thread = item.find(:first, :order => 'id DESC')
+
+    if @res_id == nil
+      return thread
+    else
+      thread.all_responses.each do |res|
+        if @res_id.to_i == res["id"].to_i
+          return res
+        end
+      end
     end
   end
 end
