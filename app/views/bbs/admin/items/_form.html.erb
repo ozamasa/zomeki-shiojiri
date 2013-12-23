@@ -1,0 +1,62 @@
+<%= init_ckeditor %>
+
+<table class="show">
+  <tr>
+    <th>スレッド</th>
+    <td>
+      <% if @item.new_record? %>
+      <%= f.select :parent_id, options_for_select(Bbs::Item.where('content_id = ? and parent_id = 0', @content.id).order('id desc').map{|item| ["#{item.id} : #{item.title}", item.id] }, :selected => @item.parent_id), {:include_blank => true} %>
+      ※ 返信する場合は、スレッドを選択してください。
+      <% else %>
+      <%= link_to "#{@item.parent_id} : #{Bbs::Item.find(@item.parent_id).title}", :id => @item.parent_id unless @item.parent_id.to_i == 0 %>
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th>投稿No.</th>
+    <td><%= @item.id %></td>
+    <%#= f.hidden_field :thread_id %>
+  </tr>
+  <tr>
+    <th>投稿日時</th>
+    <td><%= @item.created_at.strftime('%Y-%m-%d %H:%M:%S') unless @item.created_at.blank? %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:state) %></th>
+    <td><%= f.radio_buttons :state, [["公開","public"],["非公開","closed"]], :class => 'states' %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:name) %> <span class="note">※</span></th>
+    <td><%= f.text_field :name, :class => "text name" %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:title) %> <span class="note">※</span></th>
+    <td><%= f.text_field :title, :class => "text title" %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:body) %> <span class="note">※</span></th>
+    <td><%= f.text_area :body, :style => 'width: 600px; height: 240px;' %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:email) %></th>
+    <td><%= f.text_field :email, :class => "text email"  %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:uri) %></th>
+    <td><%= f.text_field :uri, :class => "text uri" %></td>
+  </tr>
+  <% if @use_password %>
+  <tr>
+    <th><%= @item.locale(:password) %></th>
+    <td><%= f.password_field :password, :class => "text password" %></td>
+  </tr>
+  <% end %>
+  <% if @use_captcha %>
+  <tr>
+    <th>画像認証</th>
+    <td><%= show_simple_captcha :object => "item", :image_style => "simply_green", :distortion => "middle", :label => "画像の文字を入力してください" %></td>
+  </tr>
+  <% end %>
+</table>
+
+</table>

@@ -13,7 +13,7 @@
 
 <div class="entryForm resForm" id="resForm">
   <h2 class="formTitle">返信フォーム</h2>
-  <%= form_for :item, :url => "#{@node_uri}#{params[:thread]}/?#{query}#resForm" do |f| %>
+  <%= form_for :item, :url => "#{@node_uri}#{params[:thread]}" do |f| %>
     <%= render :partial => "form", :locals => {:f => f} %>
     <div class="submitters">
       <% if @use_once_click %>
@@ -25,6 +25,6 @@
   <% end %>
 </div>
 
-<div class="back"><%= link_to "戻る", "#{@node_uri}?#{query}" %></div>
+<div class="back"><%= link_to "戻る", "#{@node_uri}" %></div>
 
 </div>

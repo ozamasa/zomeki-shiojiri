@@ -42,48 +42,48 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
   end
 
   def show
-    @thread_id = params[:id]
-    @res_id    = nil
-    if params[:id] =~ /\-/
-      @thread_id, @res_id = params[:id].split("-")
-    end
-
     @item = bbs_item
 
     return http_error(404) unless @item
   end
 
   def new
-    return error_auth
+    @item = Bbs::Item.new((params[:item]))
+    @item.content_id = @content.id
+    @item.state = 'closed'
   end
 
   def create
-    return error_auth
+    @item = Bbs::Item.new(params[:item])
+    @item.content_id = @content.id
+    @item.thread_id  = @item.parent_id
+    @item.parent_id  = params[:item][:parent_id].to_i
+
+    _create @item
   end
 
   def update
     @item = bbs_item
-    @item.update_attribute(:state, :public) if params[:commit_public].present?
-    @item.update_attribute(:state, :closed) if params[:commit_closed].present?
 
-    render :action => :show
+    if params[:commit_public].present?
+      @item.update_attribute(:state, :public)
+      flash[:notice] = '投稿を公開しました。'
+    elsif params[:commit_closed].present?
+      @item.update_attribute(:state, :closed)
+      flash[:notice] = '投稿を非公開にしました。'
+    else
+      @item.attributes = params[:item]
+      _update(@item)
+      return
+    end
+
+    redirect_to action: :show
   end
 
   def destroy
-    id = params[:id] =~ /\-/ ? params[:id].gsub(/.*\-/, "") : params[:id]
+    @item = bbs_item
 
-    uri = "#{@node_uri}delete.xml"
-    body = {:_method => "DELETE", :no => id, :password => @admin_password}
-    res = Util::Http::Request.post(uri, body)
-
-    if res && res.code == "200"
-      flash[:notice] = '削除処理が完了しました。'
-      redirect_to url_for(:action => :index)
-    else
-      flash.now[:notice] = '削除処理に失敗しました。'
-      show
-      render :action => :show
-    end
+    _destroy @item
   end
 
   def bbs_item
@@ -93,20 +93,6 @@ class Bbs::Admin::ItemsController < Cms::Controller::Admin::Base
       @thread_id, @res_id = params[:id].split("-")
     end
 
-    item = Bbs::Item.new
-    item.and :content_id, @content.id
-    item.and :parent_id, 0
-    item.and :thread_id, @thread_id
-    thread = item.find(:first, :order => 'id DESC')
-
-    if @res_id == nil
-      return thread
-    else
-      thread.all_responses.each do |res|
-        if @res_id.to_i == res["id"].to_i
-          return res
-        end
-      end
-    end
+    return Bbs::Item.find(@res_id.nil? ? @thread_id.to_i : @res_id.to_i)
   end
 end

@@ -57,7 +57,7 @@ class Bbs::Public::Node::ThreadsController < Cms::Controller::Public::Base
     return http_error(404) unless @thread
 
     if request.post?
-      return true if create_res
+      redirect_to "#{@node_uri}#{@thread.id}" and return if create_res
     else
       @item.title = "Re: #{@thread.title}"
     end
@@ -113,7 +113,6 @@ protected
     end
 
     flash[:notice] = "投稿が完了しました。"
-    redirect_to "#{@node_uri}#{@thread.id}/?#{query}#top"
     return true
   end
 
@@ -135,7 +134,7 @@ protected
 
     flash[:notice] = "削除が完了しました。"
     respond_to do |format|
-      format.html { redirect_to "#{@node_uri}#top" }
+      format.html { redirect_to "#{@node_uri}" }
       format.xml  { head :ok }
     end
 

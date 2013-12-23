@@ -26,7 +26,7 @@
   <% res_id = res.id %>
   <tr class="<%= cycle '', 'cycle' %>">
     <td style="text-align: center;"><%= link_to :show, url_for(:action => :show, :id => "#{thread_id}-#{res_id}") %></td>
-    <td style="text-align: center;">レス</td>
+    <td style="text-align: center;">└</td>
     <td style="text-align: right;"><%= res_id %></td>
     <td><%= truncate(res.title, :length => 30) %></td>
     <td><%= truncate(res.name, :length => 20) %></td>

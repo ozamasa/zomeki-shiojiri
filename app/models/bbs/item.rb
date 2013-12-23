@@ -39,10 +39,14 @@ class Bbs::Item < ActiveRecord::Base
 
   end
 
-  STATE_OPTIONS = [['公開保存', 'public'], ['非公開保存', 'closed']]
+  def parent
+    self.and "#{self.class.table_name}.state", 'public'
+    self.and "#{self.class.table_name}.state", 'public'
+    self
+  end
+
   def state_options
-    options = STATE_OPTIONS
-    return options
+    return [['公開保存', 'public'], ['非公開保存', 'closed']]
   end
 
 protected

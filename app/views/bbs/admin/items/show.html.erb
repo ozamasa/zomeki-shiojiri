@@ -1,32 +1,37 @@
 <table class="show">
   <tr>
+    <th>スレッド</th>
+    <td><%= link_to "#{@item.parent_id} : #{Bbs::Item.find(@item.parent_id).title}", :id => @item.parent_id unless @item.parent_id == 0 %></td>
+  </tr>
+  <tr>
     <th>投稿No.</th>
     <td><%= @item.id %></td>
   </tr>
+  <tr>
     <th>投稿日時</th>
-    <td><%= @item.created_at %></td>
+    <td><%= @item.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
+  </tr>
+  <tr>
+    <th><%= @item.locale(:state) %></th>
+    <td><%= @item.status.name %></td>
   </tr><tr>
-    <th>投稿者名</th>
+    <th><%= @item.locale(:name) %></th>
     <td><%= @item.name %></td>
   </tr><tr>
-    <th>タイトル</th>
+    <th><%= @item.locale(:title) %></th>
     <td><%= @item.title %></td>
   </tr><tr>
-    <th>本文</th>
+    <th><%= @item.locale(:body) %></th>
     <td><%=hbr @item.body.gsub(/([^ ]{120})/, "\\1 ") %></td>
   </tr>
-  <% unless @item.email.blank? %>
   <tr>
-    <th>Email</th>
+    <th><%= @item.locale(:email) %></th>
     <td><%= @item.email %></td>
   </tr>
-  <% end %>
-  <% unless @item.uri.blank? %>
   <tr>
-    <th>URL</th>
+    <th><%= @item.locale(:uri) %></th>
     <td><%= @item.uri %></td>
   </tr>
-  <% end %>
   <tr>
     <th>IPアドレス</th>
     <td><%= @item.ipaddr %></td>
@@ -34,10 +39,6 @@
   <tr>
     <th>ユーザエージェント</th>
     <td><%= @item.user_agent %></td>
-  </tr>
-  <tr>
-    <th>状態</th>
-    <td><%= @item.status.name %></td>
   </tr>
 </table>
 

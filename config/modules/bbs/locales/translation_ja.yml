@@ -1,7 +1,9 @@
-ja: 
-  activerecord: 
-    attributes: 
-      bbs/item: 
+ja:
+  activerecord:
+    models:
+      bbs/item: 投稿フォーム
+    attributes:
+      bbs/item:
         parent_id: "親ID（返信時）"
         thread_id: "スレッドID"
         content_id:  "コンテンツID"
@@ -12,7 +14,7 @@ ja:
         title: "タイトル"
         body: "本文"
         password: "削除パス"
-      
+
       ## piece
       bbs/piece/recent_item:
         list_type: "表示種別"
