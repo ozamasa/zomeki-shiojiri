@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131226020101) do
+ActiveRecord::Schema.define(:version => 20140107013000) do
 
   create_table "ad_banner_banners", :force => true do |t|
     t.string   "name"
@@ -682,6 +682,22 @@ ActiveRecord::Schema.define(:version => 20131226020101) do
   add_index "gnav_menu_items", ["content_id"], :name => "index_gnav_menu_items_on_content_id"
   add_index "gnav_menu_items", ["layout_id"], :name => "index_gnav_menu_items_on_layout_id"
 
+  create_table "gp_article_comments", :force => true do |t|
+    t.integer  "doc_id"
+    t.string   "state"
+    t.string   "author_name"
+    t.string   "author_email"
+    t.string   "author_url"
+    t.string   "remote_addr"
+    t.string   "user_agent"
+    t.text     "body"
+    t.datetime "posted_at"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "gp_article_comments", ["doc_id"], :name => "index_gp_article_comments_on_doc_id"
+
   create_table "gp_article_docs", :force => true do |t|
     t.integer  "unid"
     t.integer  "concept_id"
@@ -721,6 +737,8 @@ ActiveRecord::Schema.define(:version => 20131226020101) do
     t.integer  "template_id"
     t.text     "template_values"
     t.string   "share_to_sns_with"
+    t.text     "body_more"
+    t.string   "body_more_link_text"
   end
 
   add_index "gp_article_docs", ["concept_id"], :name => "index_gp_article_docs_on_concept_id"
@@ -1545,6 +1563,29 @@ ActiveRecord::Schema.define(:version => 20131226020101) do
   end
 
   add_index "tag_tags", ["content_id"], :name => "index_tag_tags_on_content_id"
+
+  create_table "tool_convert_docs", :force => true do |t|
+    t.string   "name"
+    t.string   "doc_class"
+    t.string   "file_path"
+    t.string   "uri_path"
+    t.string   "host"
+    t.text     "title"
+    t.datetime "published_at"
+    t.text     "body",         :limit => 2147483647
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
+
+  create_table "tool_convert_settings", :force => true do |t|
+    t.string   "site_url"
+    t.text     "title_tag"
+    t.text     "body_tag"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "tool_convert_settings", ["site_url"], :name => "index_tool_convert_settings_on_site_url"
 
   create_table "tool_simple_captcha_data", :force => true do |t|
     t.string   "key",        :limit => 40

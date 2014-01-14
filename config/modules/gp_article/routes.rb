@@ -26,11 +26,17 @@ ZomekiCMS::Application.routes.draw do
       resources :histories,
         :controller => 'admin/docs/histories', :only => [:index, :show]
     end
+    resources :comments, :only => [:index, :show, :edit, :update, :destroy],
+      :controller => 'admin/comments',
+      :path       => ':content/comments'
 
     ## nodes
     resources :node_docs,
       :controller => 'admin/node/docs',
       :path       => ':parent/node_docs'
+    resources :node_archives,
+      :controller => 'admin/node/archives',
+      :path       => ':parent/node_archives'
 
     ## pieces
     resources :piece_docs,
@@ -40,6 +46,10 @@ ZomekiCMS::Application.routes.draw do
       resources :tabs,
         :controller => 'admin/piece/recent_tabs/tabs'
     end
+    resources :piece_monthly_archives,
+      :controller => 'admin/piece/monthly_archives'
+    resources :piece_comments,
+      :controller => 'admin/piece/comments'
   end
 
   ## public
@@ -49,5 +59,10 @@ ZomekiCMS::Application.routes.draw do
     match 'node_docs/:name/file_contents/:basename.:extname' => 'public/node/docs#file_content', :format => false
     match 'node_docs/:name/preview/:id(/index)' => 'public/node/docs#show'
     match 'node_docs/:name/preview/:id/file_contents/:basename.:extname' => 'public/node/docs#file_content', :format => false
+    get 'node_docs/:name/comments/new' => 'public/node/comments#new', :format => false
+    post 'node_docs/:name/comments/confirm' => 'public/node/comments#confirm', :format => false
+    post 'node_docs/:name/comments' => 'public/node/comments#create', :format => false
+    get 'node_archives/:year/:month(/index)' => 'public/node/archives#index'
+    get 'node_archives/:year(/index)' => 'public/node/archives#index'
   end
 end

@@ -8,6 +8,7 @@ class GpArticle::Content::Doc < Cms::Content
   FEED_DISPLAY_OPTIONS = [['表示する', 'enabled'], ['表示しない', 'disabled']]
   TAG_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
   SNS_SHARE_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
+  BLOG_FUNCTIONS_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
 
   default_scope where(model: 'GpArticle::Doc')
 
@@ -33,6 +34,10 @@ class GpArticle::Content::Doc < Cms::Content
 
   def public_node
     Cms::Node.where(state: 'public', content_id: id, model: 'GpArticle::Doc').order(:id).first
+  end
+
+  def public_archives_node
+    Cms::Node.where(state: 'public', content_id: id, model: 'GpArticle::Archive').order(:id).first
   end
 
 #TODO: DEPRECATED
@@ -192,11 +197,36 @@ class GpArticle::Content::Doc < Cms::Content
     setting_extra_value(:feed, :feed_docs_period)
   end
 
+  def blog_functions_available?
+    setting_value(:blog_functions) == 'enabled'
+  end
+
+  def blog_functions
+    {comment: setting_extra_value(:blog_functions, :comment) == 'enabled',
+     comment_open: setting_extra_value(:blog_functions, :comment_open) == 'immediate',
+     comment_notification_mail: setting_extra_value(:blog_functions, :comment_notification_mail) == 'enabled'}
+  end
+
+  def comments
+    rel = GpArticle::Comment.joins(:doc)
+
+    docs = GpArticle::Doc.arel_table
+    rel = rel.where(docs[:content_id].eq(self.id))
+
+    return rel
+  end
+
+  def public_comments
+    docs = GpArticle::Doc.arel_table
+    comments.where(docs[:state].eq('public')).public
+  end
+
   private
 
   def set_default_settings
     in_settings[:list_style] = '@title(@date @group)' unless setting_value(:list_style)
     in_settings[:date_style] = '%Y年%m月%d日 %H時%M分' unless setting_value(:date_style)
+    in_settings[:wday_style] = '%a' unless setting_value(:wday_style)
     in_settings[:display_dates] = ['published_at'] unless setting_value(:display_dates)
     in_settings[:calendar_relation] = CALENDAR_RELATION_OPTIONS.first.last unless setting_value(:calendar_relation)
     in_settings[:map_relation] = MAP_RELATION_OPTIONS.first.last unless setting_value(:map_relation)
@@ -205,5 +235,6 @@ class GpArticle::Content::Doc < Cms::Content
     in_settings[:feed] = FEED_DISPLAY_OPTIONS.first.last unless setting_value(:feed)
     in_settings[:tag_relation] = TAG_RELATION_OPTIONS.first.last unless setting_value(:tag_relation)
     in_settings[:sns_share_relation] = SNS_SHARE_RELATION_OPTIONS.first.last unless setting_value(:sns_share_relation)
+    in_settings[:blog_functions] = BLOG_FUNCTIONS_OPTIONS.last.last unless setting_value(:blog_functions)
   end
 end
