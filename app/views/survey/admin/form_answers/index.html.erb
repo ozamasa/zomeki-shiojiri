@@ -2,7 +2,7 @@
   <tr>
     <th style="text-align: center; width: 60px;">詳細</th>
     <th style="text-align: center; width: 120px;"><%= Survey::FormAnswer.human_attribute_name :created_at %></th>
-    <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :answered_url %></th>
+    <th style="text-align: left; width: 150px;"><%= @items.first.answers.first.question.title if @items.first.answers %><%#= Survey::FormAnswer.human_attribute_name :answered_url %></th>
     <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :remote_addr %></th>
     <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :user_agent %></th>
   </tr>
@@ -10,7 +10,7 @@
   <tr class="<%= cycle '', 'cycle' %>">
     <td style="text-align: center;"><%= link_to :show, survey_form_form_answer_path(content: @content, form_id: @form.id, id: item.id) %></td>
     <td style="text-align: center;"><%=l item.created_at %></td>
-    <td style="text-align: left;"><%=link_to item.answered_url_title, item.answered_url, target: 'preview' %></td>
+    <td style="text-align: left;"><%=link_to item.answers.first.content, survey_form_form_answer_path(content: @content, form_id: @form.id, id: item.id) if item.answers %><%#=link_to item.answered_url_title, item.answered_url, target: 'preview' %></td>
     <td style="text-align: left;"><%= item.remote_addr %></td>
     <td style="text-align: left;"><%= item.user_agent %></td>
   </tr>

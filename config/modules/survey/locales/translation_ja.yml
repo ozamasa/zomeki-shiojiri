@@ -3,7 +3,7 @@ ja:
     models:
       survey/form: フォーム
       survey/question: 質問
-      survey/form_answer: 回答
+      survey/form_answer: 問合せ
     attributes:
       survey/form:
         state: 状態
@@ -29,8 +29,8 @@ ja:
         form_text_max_length: 最大文字数
         form_options: 選択候補
       survey/form_answer:
-        answered_url: 回答されたページ
-        created_at: 回答日時
+        answered_url: フォーム名
+        created_at: 問合せ日時
         remote_addr: IPアドレス
         user_agent: ユーザーエージェント
         captcha: 画像認証
