@@ -1,6 +1,6 @@
 # encoding: utf-8
 module DocHelper
-  def doc_replace(doc, doc_style, date_style)
+  def doc_replace(doc, doc_style, date_style, time_style='')
 
     link_to_options = link_to_doc_options(doc)
 
@@ -13,48 +13,92 @@ module DocHelper
     image_file = doc.image_files.detect{|f| f.name == doc.list_image } || doc.image_files.first if doc.list_image.present?
 
     doc_image = if image_file
-                  if link_to_options
-                    link_to *([image_tag("#{doc.content.public_node.public_uri}#{doc.name}/file_contents/#{url_encode image_file.name}")] + link_to_options)
-                  else
-                    image_tag("#{doc.content.public_node.public_uri}#{doc.name}/file_contents/#{url_encode image_file.name}")
-                  end
+                  image_tag("#{doc.public_uri}file_contents/#{url_encode image_file.name}")
                 else
                   unless (img_tags = Nokogiri::HTML.parse(doc.body).css('img[src^="file_contents/"]')).empty?
                     filename = File.basename(img_tags.first.attributes['src'].value)
-                    if link_to_options
-                      link_to *([image_tag("#{doc.content.public_node.public_uri}#{doc.name}/file_contents/#{url_encode filename}")] + link_to_options)
-                    else
-                      image_tag("#{doc.content.public_node.public_uri}#{doc.name}/file_contents/#{url_encode filename}")
-                    end
+                    image_tag("#{doc.public_uri}file_contents/#{url_encode filename}")
                   else
                     ''
                   end
                 end
 
+    doc_image_link = if link_to_options && doc_image.present?
+                       link_to *([doc_image] + link_to_options)
+                     else
+                       doc_image
+                     end
+
+    publish_date = if (dpa = doc.display_published_at)
+                     ds = localize_wday(date_style, dpa.wday)
+                     content_tag(:span, dpa.strftime(ds), class: 'publish_date')
+                   else
+                     ''
+                   end
+    update_date = if (dua = doc.display_updated_at)
+                     ds = localize_wday(date_style, dua.wday)
+                     content_tag(:span, dua.strftime(ds), class: 'update_date')
+                   else
+                     ''
+                   end
+
+    publish_time = if (dpa = doc.display_published_at)
+                     content_tag(:span, dpa.strftime(time_style), class: 'publish_time')
+                   else
+                     ''
+                   end
+    update_time = if (dua = doc.display_updated_at)
+                    content_tag(:span, dua.strftime(time_style), class: 'update_time')
+                  else
+                    ''
+                  end
+
     contents = {
       title: doc_title.blank? ? '' : content_tag(:span, doc_title, class: 'title'),
       subtitle: doc.subtitle.blank? ? '' : content_tag(:span, doc.subtitle, class: 'subtitle'),
-      publish_date: doc.display_published_at.blank? ? '' : content_tag(:span, doc.display_published_at.try(:strftime, date_style), class: 'publish_date'),
-      update_date: doc.display_updated_at.blank? ? '' : content_tag(:span, doc.display_updated_at.try(:strftime, date_style), class: 'update_date'),
+      publish_date: publish_date,
+      update_date: update_date,
+      publish_time: publish_time,
+      update_time: update_time,
       summary: doc.summary.blank? ? '' : content_tag(:span, doc.summary, class: 'summary'),
       group: doc.creator.blank? ? '' : content_tag(:span, doc.creator.group.name, class: 'group'),
       category_link: doc.categories.blank? ? '' : content_tag(:span, doc.categories.map{|c| link_to c.title, c.public_uri }.join(', ').html_safe, class: 'category'),
       category: doc.categories.blank? ? '' : content_tag(:span, doc.categories.pluck(:title).join(', '), class: 'category'),
+      image_link: doc_image_link.blank? ? '' : content_tag(:span, doc_image_link, class: 'image'),
       image: doc_image.blank? ? '' : content_tag(:span, doc_image, class: 'image'),
+      body_beginning: doc.body.blank? ? '' : content_tag(:span, "#{file_path_expanded_body(doc)}#{content_tag(:div, link_to(doc.body_more_link_text, doc.public_uri), class: 'continues') if doc.body_more.present? }".html_safe, class: 'body'),
+      body: "#{doc.body}#{doc.body_more}".blank? ? '' : content_tag(:span, "#{file_path_expanded_body(doc)}#{doc.body_more}".html_safe, class: 'body'),
+      user: doc.creator.user.name.blank? ? '' : content_tag(:span, doc.creator.user.name, class: 'user'),
+      comment_count: content_tag(:span, link_to(doc.comments.count, "#{doc.public_uri}#comments"), class: 'comment_count'),
       }
 
     if Page.mobile?
       contents[:title]
     else
-      doc_style.gsub(/@title@?/, contents[:title])
-               .gsub(/@subtitle@?/, contents[:subtitle])
-               .gsub(/@publish_date@?/, contents[:publish_date])
-               .gsub(/@update_date@?/, contents[:update_date])
-               .gsub(/@summary@?/, contents[:summary])
-               .gsub(/@group@?/, contents[:group])
-               .gsub(/@category_link@?/, contents[:category_link])
-               .gsub(/@category@?/, contents[:category])
-               .gsub(/@image@?/, contents[:image]).html_safe
+      doc_style = doc_style.gsub(/@body_(\d+)@/){|m| truncate(strip_tags(doc.body), length: $1.to_i) }
+
+      doc_style.gsub(/@\w+@/, {
+        '@title@' => contents[:title],
+        '@subtitle@' => contents[:subtitle],
+        '@publish_date@' => contents[:publish_date],
+        '@update_date@' => contents[:update_date],
+        '@publish_time@' => contents[:publish_time],
+        '@update_time@' => contents[:update_time],
+        '@summary@' => contents[:summary],
+        '@group@' => contents[:group],
+        '@category_link@' => contents[:category_link],
+        '@category@' => contents[:category],
+        '@image_link@' => contents[:image_link],
+        '@image@' => contents[:image],
+        '@body_beginning@' => contents[:body_beginning],
+        '@body@' => contents[:body],
+        '@user@' => contents[:user],
+        '@comment_count@' => contents[:comment_count],
+      }).html_safe
     end
+  end
+
+  def file_path_expanded_body(doc)
+    doc.body.gsub('"file_contents/', %Q("#{doc.public_uri}file_contents/))
   end
 end

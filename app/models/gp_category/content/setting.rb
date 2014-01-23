@@ -3,9 +3,11 @@ class GpCategory::Content::Setting < Cms::ContentSetting
   set_config :group_category_type_name, :name => "組織用#{GpCategory::CategoryType.human_attribute_name :name}",
     :comment => '初期値 ： groups'
   set_config :list_style, :name => "#{GpArticle::Doc.model_name.human}表示形式",
-    :comment => I18n.t('comments.list_style').html_safe
+    :form_type => :text_area, :comment_upper => I18n.t('comments.doc_style').html_safe
   set_config :date_style, :name => "#{GpArticle::Doc.model_name.human}日付形式",
     :comment => I18n.t('comments.date_style').html_safe
+  set_config :time_style, :name => "#{GpArticle::Doc.model_name.human}時間形式",
+    :comment => I18n.t('comments.time_style').html_safe
   set_config :category_type_style, :name => "#{GpCategory::CategoryType.model_name.human}表示形式",
     :options => GpCategory::Content::CategoryType::CATEGORY_TYPE_STYLE_OPTIONS
   set_config :category_style, :name => "#{GpCategory::Category.model_name.human}表示形式",
