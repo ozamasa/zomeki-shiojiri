@@ -8,6 +8,8 @@ class GpCategory::Content::CategoryType < Cms::Content
   default_scope where(model: 'GpCategory::CategoryType')
 
   has_many :category_types, :foreign_key => :content_id, :class_name => 'GpCategory::CategoryType', :order => :sort_no, :dependent => :destroy
+  has_many :templates, :foreign_key => :content_id, :class_name => 'GpCategory::Template', :dependent => :destroy
+  has_many :template_modules, :foreign_key => :content_id, :class_name => 'GpCategory::TemplateModule', :dependent => :destroy
 
   before_create :set_default_settings
 
@@ -90,6 +92,10 @@ class GpCategory::Content::CategoryType < Cms::Content
 
   def feed_docs_period
     setting_extra_value(:feed, :feed_docs_period)
+  end
+
+  def index_template
+    templates.find_by_id(setting_value(:index_template_id))
   end
 
   private
