@@ -39,6 +39,10 @@
     <div id="title_settings" style="display: none;">
       <table class="show">
         <tr>
+          <th><%= @item.locale :title_kana %></th>
+          <td><%=simple_format @item.title_kana %></td>
+        </tr>
+        <tr>
           <th><%= @item.locale :href %></th>
           <td>
             <%= link_to_unless(@item.target == 'attached_file', @item.href, @item.href, target: '_blank') %>

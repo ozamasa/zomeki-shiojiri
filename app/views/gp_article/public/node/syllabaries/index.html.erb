@@ -1,0 +1,16 @@
+<div class="contentGpArticleDocs">
+  <div class="docs">
+    <% kana_sav, kana_doc = '' -%>
+    <% @docs.each do |doc| -%>
+    <% kana_doc = doc.title_kana.first unless doc.title_kana.blank? %>
+    <% if kana_sav != kana_doc -%>
+    <%= '</ul>'.html_safe %>
+    <h2 class="ruby"><%= kana_doc %></h2>
+    <ul>
+    <% kana_sav = kana_doc -%>
+    <% end -%>
+    <li><%= doc_replace(doc, @content.list_style, @content.date_style, @content.time_style) %></li>
+    <%- end -%>
+    <%= '</ul>'.html_safe unless @docs.empty? %>
+  </div>
+</div>

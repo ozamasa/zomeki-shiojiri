@@ -33,6 +33,10 @@
     <div id="title_settings" style="display: none;">
       <table class="show">
         <tr>
+          <th><%= f.label :title_kana %></th>
+          <td colspan="2"><%= f.text_field :title_kana, :style => 'width: 440px;' %></td>
+        </tr>
+        <tr>
           <th><%= f.label :href %></th>
           <td><%= f.text_field :href, :style => 'width: 500px;' %></td>
           <td><%= f.radio_buttons :target, GpArticle::Doc::TARGET_OPTIONS %></td>
