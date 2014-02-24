@@ -6,6 +6,7 @@ Cms::Lib::Modules::ModuleSet.draw :gp_article, '汎用記事' do |mod|
   ## directories
   mod.directory :docs, '汎用記事ページ'
   mod.directory :archives, 'アーカイブ一覧'
+  mod.directory :syllabaries, '五十音別ページ'
 
   ## pieces
   mod.piece :docs, '汎用記事一覧'

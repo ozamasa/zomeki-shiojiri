@@ -37,6 +37,9 @@ ZomekiCMS::Application.routes.draw do
     resources :node_archives,
       :controller => 'admin/node/archives',
       :path       => ':parent/node_archives'
+    resources :node_syllabaries,
+      :controller => 'admin/node/syllabaries',
+      :path       => ':parent/node_syllabaries'
 
     ## pieces
     resources :piece_docs,
@@ -64,5 +67,6 @@ ZomekiCMS::Application.routes.draw do
     post 'node_docs/:name/comments' => 'public/node/comments#create', :format => false
     get 'node_archives/:year(/(index))' => 'public/node/archives#index'
     get 'node_archives/:year/:month(/(index))' => 'public/node/archives#index'
+    get 'node_syllabaries(/index)' => 'public/node/syllabaries#index'
   end
 end
