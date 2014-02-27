@@ -42,6 +42,9 @@ ZomekiCMS::Application.routes.draw do
     resources :node_this_weeks,
       :controller => 'admin/node/this_weeks',
       :path       => ':parent/node_this_weeks'
+    resources :node_this_months,
+      :controller => 'admin/node/this_months',
+      :path       => ':parent/node_this_months'
 
     ## pieces
     resources :piece_ranks,
@@ -54,5 +57,6 @@ ZomekiCMS::Application.routes.draw do
     match 'node_last_weeks(/index.:format)' => 'public/node/last_weeks#index'
     match 'node_last_months(/index.:format)' => 'public/node/last_months#index'
     match 'node_this_weeks(/index.:format)' => 'public/node/this_weeks#index'
+    match 'node_this_months(/index.:format)' => 'public/node/this_months#index'
   end
 end

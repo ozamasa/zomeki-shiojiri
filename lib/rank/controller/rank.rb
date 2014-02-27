@@ -80,6 +80,9 @@ module Rank::Controller::Rank
           when 'this_weeks'
             from = t.yesterday - 7.days
             to   = t.yesterday
+          when 'this_months'
+            from = t.yesterday - 30.days
+            to   = t.yesterday
           end
 
           rank_table = Rank::Rank.arel_table
