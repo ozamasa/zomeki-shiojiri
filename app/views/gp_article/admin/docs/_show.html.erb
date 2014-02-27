@@ -40,7 +40,7 @@
       <table class="show">
         <tr>
           <th><%= @item.locale :title_kana %></th>
-          <td><%=simple_format @item.title_kana %></td>
+          <td><%=simple_format "#{@item.title_kana}, #{@item.title_column}行" %></td>
         </tr>
         <tr>
           <th><%= @item.locale :href %></th>

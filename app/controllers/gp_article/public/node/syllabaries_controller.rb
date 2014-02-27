@@ -6,8 +6,7 @@ class GpArticle::Public::Node::SyllabariesController < Cms::Controller::Public::
   end
 
   def index
-    docs = GpArticle::Doc.arel_table
-    @docs = @content.public_docs.order(:title_kana)
+    @docs = @content.public_docs.order(:title_column).order(:title_kana)
   end
 
 end

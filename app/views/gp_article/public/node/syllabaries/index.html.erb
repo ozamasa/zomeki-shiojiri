@@ -2,7 +2,7 @@
   <div class="docs">
     <% kana_sav, kana_doc = '' -%>
     <% @docs.each do |doc| -%>
-    <% kana_doc = doc.title_kana.first unless doc.title_kana.blank? %>
+    <% kana_doc = doc.title_column unless doc.title_column.blank? %>
     <% if kana_sav != kana_doc -%>
     <%= '</ul>'.html_safe %>
     <h2 class="ruby"><%= kana_doc %></h2>

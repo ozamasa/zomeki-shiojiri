@@ -28,6 +28,7 @@
       <div>
         <div class="label1"><%= f.label :title_kana %></div>
         <%= f.text_field :title_kana, :style => 'width: 290px;' %>
+        <%= f.select :title_column, options_for_select([['ア行','ア'],['カ行','カ'],['サ行','サ'],['タ行','タ'],['ナ行','ナ'],['ハ行','ハ'],['マ行','マ'],['ヤ行','ヤ'],['ラ行','ラ'],['ワ行','ワ']]), include_blank: true %>
       </div>
       <div>
         <div class="label1"><%= f.label :href %></div>
