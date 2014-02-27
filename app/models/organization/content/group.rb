@@ -43,21 +43,29 @@ class Organization::Content::Group < Cms::Content
     }
   end
 
+  def doc_style
+    setting_value(:doc_style).to_s
+  end
+
+  def date_style
+    setting_value(:date_style).to_s
+  end
+
+  def time_style
+    setting_value(:time_style).to_s
+  end
+
   private
 
   def copy_from_sys_group(sys_group)
-    group = groups.where(sys_group_code: sys_group.code).first_or_create(name: sys_group.name_en)
-    unless group.persisted?
-      group.name = "#{sys_group.name_en}_#{sys_group.code}"
-      group.save
-    end
+    group = groups.where(sys_group_code: sys_group.code).first_or_create(name: sys_group.code)
     sys_group.children.each{|c| copy_from_sys_group(c) } unless sys_group.children.empty?
   end
 
   def set_default_settings
     in_settings[:hold_doc_url] = HOLD_DOC_URL_OPTIONS.last.last unless setting_value(:hold_doc_url)
     in_settings[:doc_style] = '@title@ (@publish_date@ @group@)' unless setting_value(:doc_style)
-    in_settings[:date_style] = '%Y年%m月%d日 %H時%M分' unless setting_value(:date_style)
+    in_settings[:date_style] = '%Y年%m月%d日' unless setting_value(:date_style)
     in_settings[:time_style] = '%H時%M分' unless setting_value(:time_style)
   end
 end
