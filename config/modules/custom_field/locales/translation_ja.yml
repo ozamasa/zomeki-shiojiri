@@ -1,0 +1,17 @@
+ja:
+  activerecord:
+    models:
+      custom_field/form: カスタムフィールド
+      custom_field/doc: 記事
+    attributes:
+      custom_field/form:
+        name: フィールド名
+        title: タイトル
+        type: 表示形式
+        style: スタイルシート
+        sort_no: 並び順
+        created_at: 作成日時
+      custom_field/doc:
+        title: タイトル
+        title_kana: フリガナ
+      custom_field/doc/import:

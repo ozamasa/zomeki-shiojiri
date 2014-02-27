@@ -1,0 +1,23 @@
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :title_kana %></th>
+    <td><%= @item.title_kana %></td>
+  </tr>
+<% @fields.each do |field| -%>
+  <tr>
+    <th><%= field.title %></th>
+    <td><%= @item.fields.find_by_custom_field_form_id(field.id)[:value] %></td>
+  </tr>
+<% end -%>
+</table>
+
+<div class="submitters">
+<%= form_tag 'article', method: :post, style: 'display: inline' do %>
+  <%= hidden_field_tag :id, @item.id %>
+  <%= submit_tag '記事にする', name: :submit_import %>
+<% end %>
+</div>

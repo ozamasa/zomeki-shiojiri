@@ -1,0 +1,22 @@
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :name %></th>
+    <td><%= @item.name %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :type %></th>
+    <td><%=raw @item.type %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :style %></th>
+    <td><%=raw @item.style %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :sort_no %></th>
+    <td><%=raw @item.sort_no %></td>
+  </tr>
+</table>

@@ -1,0 +1,12 @@
+<div class="mainMenu">
+  <%= render 'layouts/admin/cms/menu', :current => :content %>
+</div>
+
+<div class="contentMenu">
+  <%= link_to "#{CustomField::Doc.model_name.human}一覧", custom_field_docs_path(content: @content), class: 'fixed' %>
+  <%= link_to "#{CustomField::Form.model_name.human}一覧", custom_field_forms_path(content: @content), class: 'fixed' %>
+  <%- if Core.user.has_auth?(:designer) -%>
+  <%= link_to '設定', custom_field_content_settings_path, class: 'fixed' %>
+  <%- end -%>
+  <%= link_to 'インポート', custom_field_import_index_path, class: 'fixed' %>
+</div>

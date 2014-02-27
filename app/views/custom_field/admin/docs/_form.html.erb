@@ -1,0 +1,18 @@
+<span class="note">※は必須項目です。</span>
+
+<table class="show">
+  <tr>
+    <th><%= f.label :title %> <span class="note">※</span></th>
+    <td><%= f.text_field :title, style: 'width: 600px;' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title_kana %></th>
+    <td><%= f.text_field :title_kana, style: 'width: 600px;' %></td>
+  </tr>
+<% @fields.each do |field| -%>
+  <tr>
+    <th><%= field.title %></th>
+    <td><%= text_field_tag "[item][field][#{field.id}]", @item.fields.find_by_custom_field_form_id(field.id)[:value], style: 'width: 600px;' %></td>
+  </tr>
+<% end -%>
+</table>

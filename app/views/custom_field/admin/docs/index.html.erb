@@ -1,0 +1,21 @@
+<table class="index">
+  <tr>
+    <th style="text-align: center; width: 60px;">詳細</th>
+    <th><%= CustomField::Doc.human_attribute_name :title %></th>
+    <th><%= CustomField::Doc.human_attribute_name :title_kana %></th>
+    <th style="text-align: center; width: 65px;">プレビュー</th>
+  </tr>
+  <%- @items.each do |item| -%>
+  <tr class="<%= cycle '', 'cycle' %>">
+    <td style="text-align: center;"><%= link_to :show, custom_field_doc_path(content: @content, id: item.id) %></td>
+    <td style="text-align: left;"><%= item.title %></td>
+    <td style="text-align: left;"><%= item.title_kana %></td>
+    <td style="text-align: center;">
+      <%#= link_to_if @content.public_node && item.preview_uri.present?, 'PC', item.preview_uri, target: '_blank' %>
+      <%#= link_to_if @content.public_node && item.preview_uri.present?, '携帯', item.preview_uri(mobile: true), target: '_blank' %>
+    </td>
+  </tr>
+  <%- end -%>
+</table>
+
+<%= paginate @items -%>

@@ -1,0 +1,5 @@
+<%= form_for(:item, :url => {:action => :import}, :html => {:method => :post, :multipart => true}) do |f| %>
+CSVファイル ： <%= f.file_field :file %><br /><br />
+<%= f.submit 'インポート', :style => 'width: 120px;' %><br />
+<% end %>
+<br />

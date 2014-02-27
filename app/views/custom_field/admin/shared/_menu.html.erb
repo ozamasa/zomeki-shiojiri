@@ -1,0 +1,22 @@
+<h2><%= @content.name %><%= @form ? " ： #{@form.title}" : '' %><%= defined?(sub) ? " ： #{sub}" : '' %></h2>
+
+<div class="actionMenu">
+  <%- if action_name == 'index' -%>
+  <%= link_to '新規作成', url_for(action: 'new') %>
+  <%- end -%>
+
+  <%- if %w|new create show edit update|.include?(action_name) -%>
+  <%= link_to '一覧', url_for(action: 'index') %>
+  <%- end -%>
+
+  <%- if %w|edit update|.include?(action_name) -%>
+  <span class="separator"></span>
+  <%= link_to '詳細', url_for(action: 'show') %>
+  <%- end -%>
+
+  <%- if action_name == 'show' -%>
+  <span class="separator"></span>
+  <%= link_to '編集', url_for(action: 'edit') %>
+  <%= link_to '削除', url_for(action: 'destroy'), :method => :delete, :confirm => '削除してよろしいですか？' %>
+  <%- end -%>
+</div>
