@@ -1,10 +1,12 @@
-# encoding: utf-8
 class CustomField::Admin::ImportController < Cms::Controller::Admin::Base
   include Sys::Controller::Scaffold::Base
+  include CustomField::Controller::Article
 
   def pre_dispatch
     return error_auth unless @content = CustomField::Content::Doc.find(params[:content])
     return error_auth unless Core.user.has_priv?(:read, :item => @content.concept)
+    @fields = CustomField::Form.where(content_id: @content.id)
+    @gparticle = GpArticle::Content::Doc.find(@content.setting_value(:gp_article)) unless @content.setting_value(:gp_article).blank?
   end
 
   def index
@@ -40,6 +42,8 @@ class CustomField::Admin::ImportController < Cms::Controller::Admin::Base
           field.save
         end
 
+        status = 2 unless create_article(doc.id)
+
         @results[status] += 1
       end
     end
@@ -50,7 +54,7 @@ class CustomField::Admin::ImportController < Cms::Controller::Admin::Base
     Core.messages << "-- 失敗 #{@results[2]}件"
 
     flash[:notice] = "インポートが終了しました。<br />#{Core.messages.join('<br />')}".html_safe
-    return redirect_to(:action => :index)
+    return redirect_to action: :index
   end
 
 end

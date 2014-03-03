@@ -1,10 +1,12 @@
 class CustomField::Admin::DocsController < Cms::Controller::Admin::Base
   include Sys::Controller::Scaffold::Base
+  include CustomField::Controller::Article
 
   def pre_dispatch
     return error_auth unless @content = CustomField::Content::Doc.find(params[:content])
     return error_auth unless Core.user.has_priv?(:read, :item => @content.concept)
     @fields = CustomField::Form.where(content_id: @content.id)
+    @gparticle = GpArticle::Content::Doc.find(@content.setting_value(:gp_article)) unless @content.setting_value(:gp_article).blank?
   end
 
   def index
@@ -50,33 +52,13 @@ class CustomField::Admin::DocsController < Cms::Controller::Admin::Base
   end
 
   def article
-    content_id = @content.setting_value(:gp_article)
-    return if @content.setting_value(:gp_article).blank?
-
-    @item = @content.docs.find(params[:id])
-    body = @content.setting_value(:doc_style)
-
-    @fields.each do |field|
-      pattern = "@#{field.name}@"
-      value   = @item.fields.find_by_content_id_and_custom_field_form_id(@content.id, field.id).value.to_s
-      body.gsub!(pattern, value)
-    end
-
-    doc = nil
-    unless @item.gp_article_doc_id.blank?
-      doc = GpArticle::Doc.find(@item.gp_article_doc_id)
+    if create_article(params[:id])
+      flash[:notice] = "登録処理が完了しました。（#{I18n.l Time.now}）"
     else
-      doc = GpArticle::Doc.new(content_id: content_id)
+      flash.now[:alert] = '登録処理に失敗しました。'
     end
 
-    doc.title      = @item.title
-    doc.title_kana = @item.title_kana
-    doc.body       = body
-    doc.save
-
-    @item.update_attributes(gp_article_doc_id: doc.id)
-
-    redirect_to :action => :index
+    redirect_to action: :index
   end
 
 end
