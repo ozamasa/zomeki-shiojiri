@@ -1,5 +1,5 @@
 class Organization::Content::Group < Cms::Content
-  HOLD_DOC_URL_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
+  ARTICLE_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
 
   default_scope where(model: 'Organization::Group')
 
@@ -15,11 +15,13 @@ class Organization::Content::Group < Cms::Content
     return unless root_sys_group
 
     root_sys_group.children.each do |child|
+      next if (root_sys_group.sites & child.sites).empty?
       copy_from_sys_group(child)
     end
 
     groups.each do |group|
-      group.destroy if group.sys_group.nil?
+      group.destroy if group.sys_group.nil? ||
+                       (root_sys_group.sites & group.sys_group.sites).empty?
     end
   end
 
@@ -43,6 +45,14 @@ class Organization::Content::Group < Cms::Content
     }
   end
 
+  def article_related?
+    setting_value(:article_relation) == 'enabled'
+  end
+
+  def related_article_content
+    GpArticle::Content::Doc.find_by_id(setting_extra_value(:article_relation, :gp_article_content_doc_id))
+  end
+
   def doc_style
     setting_value(:doc_style).to_s
   end
@@ -63,11 +73,16 @@ class Organization::Content::Group < Cms::Content
 
   def copy_from_sys_group(sys_group)
     group = groups.where(sys_group_code: sys_group.code).first_or_create(name: sys_group.code)
-    sys_group.children.each{|c| copy_from_sys_group(c) } unless sys_group.children.empty?
+    unless sys_group.children.empty?
+      sys_group.children.each do |child|
+        next if (sys_group.sites & child.sites).empty?
+        copy_from_sys_group(child)
+      end
+    end
   end
 
   def set_default_settings
-    in_settings[:hold_doc_url] = HOLD_DOC_URL_OPTIONS.last.last unless setting_value(:hold_doc_url)
+    in_settings[:article_relation] = ARTICLE_RELATION_OPTIONS.last.last unless setting_value(:article_relation)
     in_settings[:doc_style] = '@title@ (@publish_date@ @group@)' unless setting_value(:doc_style)
     in_settings[:date_style] = '%Y年%m月%d日' unless setting_value(:date_style)
     in_settings[:time_style] = '%H時%M分' unless setting_value(:time_style)

@@ -1,12 +1,12 @@
-<div class="contentOrganization contentOrganizationGroup">
+<div class="contentOrganization contentOrganizationGroup<%= @group.parent ? 'Unit' : 'Department' %>">
   <%- unless @docs.empty? -%>
-  <h2>新着記事</h2>
+  <div class="articleHeader"><h2>新着情報</h2></div>
   <ul>
     <%- @docs.each do |doc| -%>
     <li><%= doc_replace(doc, @content.doc_style, @content.date_style, @content.time_style) %></li>
     <%- end -%>
   </ul>
-  <div class="more"><%= link_to '一覧へ', "#{@group.public_uri}more.html" %></div>
+  <div class="more"><%= link_to '>>新着情報の一覧を見る', "#{@group.public_uri}more.html" %></div>
   <%- end -%>
 
   <%- if false -%>

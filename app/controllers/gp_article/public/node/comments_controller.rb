@@ -2,7 +2,13 @@ class GpArticle::Public::Node::CommentsController < Cms::Controller::Public::Bas
   include SimpleCaptcha::ControllerHelpers
 
   def pre_dispatch
-    @content = GpArticle::Content::Doc.find_by_id(Page.current_node.content.id)
+    if (organization_content = Page.current_node.content).kind_of?(Organization::Content::Group)
+      return http_error(404) unless organization_content.article_related?
+      @content = organization_content.related_article_content
+    else
+      @content = GpArticle::Content::Doc.find_by_id(Page.current_node.content.id)
+    end
+
     return http_error(404) unless @content
 
     return http_error(404) unless @content.blog_functions[:comment]

@@ -226,6 +226,10 @@ class GpArticle::Content::Doc < Cms::Content
     comments.where(docs[:state].eq('public')).public
   end
 
+  def organization_content_group
+    Organization::Content::Group.find_by_id(setting_value(:organization_content_group_id))
+  end
+
   private
 
   def set_default_settings

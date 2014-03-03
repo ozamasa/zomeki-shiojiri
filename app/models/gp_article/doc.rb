@@ -223,22 +223,28 @@ class GpArticle::Doc < ActiveRecord::Base
   end
 
   def public_uri(without_filename: false)
-    unless content
-      warn_log "No content: #{self.inspect}"
-      return ''
-    end
     return '' unless node = content.public_node
-    uri = "#{node.public_uri}#{name}/"
+    uri = if (organization_content = content.organization_content_group) &&
+            organization_content.article_related? &&
+            organization_content.related_article_content == content
+
+            group = organization_content.groups.where(sys_group_code: creator.group.code).first
+            "#{group.public_uri}#{name}/" if group
+          end
+    uri ||= "#{node.public_uri}#{name}/"
     without_filename || filename_base == 'index' ? uri : "#{uri}#{filename_base}.html"
   end
 
   def public_full_uri(without_filename: false)
-    unless content
-      warn_log "No content: #{self.inspect}"
-      return ''
-    end
     return '' unless node = content.public_node
-    uri = "#{node.public_full_uri}#{name}/"
+    uri = if (organization_content = content.organization_content_group) &&
+            organization_content.article_related? &&
+            organization_content.related_article_content == content
+
+            group = organization_content.groups.where(sys_group_code: creator.group.code).first
+            "#{group.public_full_uri}#{name}/" if group
+          end
+    uri ||= "#{node.public_full_uri}#{name}/"
     without_filename || filename_base == 'index' ? uri : "#{uri}#{filename_base}.html"
   end
 
@@ -649,7 +655,7 @@ class GpArticle::Doc < ActiveRecord::Base
 
     errors.add(:name, :invalid) if self.name && self.name !~ /^[\-\w]*$/
 
-    if (doc = self.class.find_by_name_and_state(self.name, self.state))
+    if (doc = self.class.find_by_name_and_state_and_content_id(self.name, self.state, self.content.id))
       unless doc.id == self.id || state_archived?
         errors.add(:name, :taken) unless state_public? && prev_edition.try(:state_public?)
       end
