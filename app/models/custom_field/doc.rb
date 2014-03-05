@@ -11,4 +11,10 @@ class CustomField::Doc < ActiveRecord::Base
 
   accepts_nested_attributes_for :fields #, allow_destroy: true
 
+  def gp_article_doc(gparticle)
+  	if gparticle && gp_article_doc_id.presence
+    	gparticle.docs.find(gp_article_doc_id) rescue nil
+    end
+  end
+
 end

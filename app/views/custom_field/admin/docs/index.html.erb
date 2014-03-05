@@ -11,7 +11,7 @@
     <td style="text-align: left;"><%= item.title %></td>
     <td style="text-align: left;"><%= item.title_kana %></td>
     <td style="text-align: center;">
-      <%= link_to '記事', gp_article_doc_url(@gparticle, @gparticle.docs.find(item.gp_article_doc_id)) if @gparticle && item.gp_article_doc_id.presence %>
+      <%= link_to '記事', gp_article_doc_url(@gparticle, item.gp_article_doc(@gparticle)) if item.gp_article_doc(@gparticle) %>
     </td>
   </tr>
   <%- end -%>
