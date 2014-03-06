@@ -57,6 +57,8 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
                  else
                    @item.mobile_title.presence || @item.title
                  end
+
+    read_to_session
   end
 
   def file_content
@@ -100,5 +102,12 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
         end
       end
     end
+  end
+
+  def read_to_session
+#    session.delete(:recent_ids)
+    ids = session[:recent_ids] || []
+    ids.delete(@item.id)
+    session[:recent_ids] = (ids << @item.id).uniq.pop(10)
   end
 end

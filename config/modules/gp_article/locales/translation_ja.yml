@@ -94,3 +94,8 @@ ja:
         state: 状態
         remote_addr: IPアドレス
         user_agent: ユーザーエージェント
+      gp_article/piece/recent_article:
+        list_count: 表示件数
+        list_style: 表示形式
+        date_style: 日付形式
+        more_label: 一覧リンク文字

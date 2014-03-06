@@ -13,4 +13,5 @@ Cms::Lib::Modules::ModuleSet.draw :gp_article, '汎用記事' do |mod|
   mod.piece :recent_tabs, '新着タブ'
   mod.piece :monthly_archives, '月間アーカイブ'
   mod.piece :comments, '最新コメント'
+  mod.piece :recent_articles, '最近見た記事'
 end

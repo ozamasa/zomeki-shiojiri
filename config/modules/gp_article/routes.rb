@@ -53,6 +53,8 @@ ZomekiCMS::Application.routes.draw do
       :controller => 'admin/piece/monthly_archives'
     resources :piece_comments,
       :controller => 'admin/piece/comments'
+    resources :piece_recent_articles,
+      :controller => 'admin/piece/recent_articles'
   end
 
   ## public
