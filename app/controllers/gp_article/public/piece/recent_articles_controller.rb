@@ -7,10 +7,15 @@ class GpArticle::Public::Piece::RecentArticlesController < Sys::Controller::Publ
   def index
     @docs = []
     ids = session[:recent_ids]
-    ids.reverse.each.with_index do |id, i|
-      next if i == 0
-      @docs << @piece.content.public_docs.find(id)
-      break if i == @piece.list_count
+    i = 0
+    ids.reverse.each do |id|
+      next if id == Page.current_item.id
+      begin
+        @docs << @piece.content.public_docs.find(id)
+        i += 1
+      rescue
+      end
+      break if i >= @piece.list_count
     end
   end
 end

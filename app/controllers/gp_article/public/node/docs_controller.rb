@@ -108,6 +108,6 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
 #    session.delete(:recent_ids)
     ids = session[:recent_ids] || []
     ids.delete(@item.id)
-    session[:recent_ids] = (ids << @item.id).uniq.pop(10)
+    session[:recent_ids] = (ids << @item.id).uniq #.pop(20)
   end
 end

@@ -1,5 +1,4 @@
 class GpArticle::Piece::RecentArticle < Cms::Piece
-#  default_scope where(model: 'GpArticle::RecentTab')
 
   after_initialize :set_default_settings
 
