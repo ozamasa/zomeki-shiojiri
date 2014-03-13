@@ -13,9 +13,9 @@ class Organization::Group < ActiveRecord::Base
   DOCS_ORDER_OPTIONS = [['公開日（降順）', 'display_published_at DESC, published_at DESC'],
                         ['公開日（昇順）', 'display_published_at ASC, published_at ASC']]
 
-  default_scope order("#{self.table_name}.sort_no IS NULL, #{self.table_name}.sort_no")
-  scope :public, where(state: 'public')
-  scope :none, where('id IS ?', nil).where('id IS NOT ?', nil)
+  default_scope { order("#{self.table_name}.sort_no IS NULL, #{self.table_name}.sort_no") }
+  scope :public, -> { where(state: 'public') }
+  scope :none, -> { where('id IS ?', nil).where('id IS NOT ?', nil) }
 
   # Page
   belongs_to :concept, :class_name => 'Cms::Concept'
@@ -31,8 +31,9 @@ class Organization::Group < ActiveRecord::Base
 
   after_initialize :set_defaults
 
-  validates :name, :presence => true, :uniqueness => true
+  validates :name, :presence => true
   validates :sys_group_code, :presence => true, :uniqueness => true
+  validate :name_uniqueness_in_siblings
 
   def sitemap_state_text
     SITEMAP_STATE_OPTIONS.detect{|o| o.last == self.sitemap_state }.try(:first).to_s
@@ -48,16 +49,12 @@ class Organization::Group < ActiveRecord::Base
 
   def public_uri
     return '' unless content.public_node
-#TODO: Revert flatted groups
-#    "#{content.public_node.public_uri}#{path_from_root}/"
-    "#{content.public_node.public_uri}#{name}/"
+    "#{content.public_node.public_uri}#{path_from_root}/"
   end
 
   def public_full_uri
     return '' unless content.public_node
-#TODO: Revert flatted groups
-#    "#{content.public_node.public_full_uri}#{path_from_root}/"
-    "#{content.public_node.public_full_uri}#{name}/"
+    "#{content.public_node.public_full_uri}#{path_from_root}/"
   end
 
   def parent
@@ -100,9 +97,7 @@ class Organization::Group < ActiveRecord::Base
 
     if (node = content.try(:public_node))
       c = node.bread_crumbs.crumbs.first
-#TODO: Revert flatted groups
-#      ancestors.each{|a| c << [a.sys_group.name, "#{node.public_uri}#{a.path_from_root}/"] }
-      ancestors.each{|a| c << [a.sys_group.name, "#{node.public_uri}#{a.name}/"] }
+      ancestors.each{|a| c << [a.sys_group.name, "#{node.public_uri}#{a.path_from_root}/"] }
       crumbs << c
     end
 
@@ -124,5 +119,10 @@ class Organization::Group < ActiveRecord::Base
     self.sitemap_state = SITEMAP_STATE_OPTIONS.first.last if self.has_attribute?(:sitemap_state) && self.sitemap_state.nil?
     self.docs_order = DOCS_ORDER_OPTIONS.first.last if self.has_attribute?(:docs_order) && self.docs_order.nil?
     self.sort_no = 10 if self.has_attribute?(:sort_no) && self.sort_no.nil?
+  end
+
+  def name_uniqueness_in_siblings
+    siblings = parent ? parent.children : content.root_groups
+    errors.add(:name, :taken) unless siblings.where(name: name).where('id != ?', id).empty?
   end
 end

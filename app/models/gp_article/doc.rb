@@ -28,7 +28,11 @@ class GpArticle::Doc < ActiveRecord::Base
   FEATURE_1_OPTIONS = [['表示', true], ['非表示', false]]
   FEATURE_2_OPTIONS = [['表示', true], ['非表示', false]]
 
-  default_scope where("#{self.table_name}.state != 'archived'")
+  default_scope { where("#{self.table_name}.state != 'archived'") }
+  scope :public, -> { where(state: 'public') }
+  scope :mobile, ->(m) { m ? where(terminal_mobile: true) : where(terminal_pc_or_smart_phone: true) }
+  scope :none, -> { where('id IS ?', nil).where('id IS NOT ?', nil) }
+  scope :display_published_after, ->(date) { where(arel_table[:display_published_at].gteq(date)) }
 
   # Content
   belongs_to :content, :foreign_key => :content_id, :class_name => 'GpArticle::Content::Doc'
@@ -46,13 +50,19 @@ class GpArticle::Doc < ActiveRecord::Base
   has_many :categorizations, :class_name => 'GpCategory::Categorization', :as => :categorizable, :dependent => :destroy
   has_many :categories, :class_name => 'GpCategory::Category', :through => :categorizations,
            :conditions => ["#{GpCategory::Categorization.table_name}.categorized_as = ?", self.name],
-           :after_add => proc {|d, c| d.categorizations.find_by_category_id_and_categorized_as(c.id, nil).update_column(:categorized_as, d.class.name) }
+           :after_add => proc {|d, c|
+             d.categorizations.where(category_id: c.id, categorized_as: nil).first.update_column(:categorized_as, d.class.name)
+           }
   has_many :event_categories, :class_name => 'GpCategory::Category', :through => :categorizations,
            :source => :category, :conditions => ["#{GpCategory::Categorization.table_name}.categorized_as = ?", 'GpCalendar::Event'],
-           :after_add => proc {|d, c| d.categorizations.find_by_category_id_and_categorized_as(c.id, nil).update_column(:categorized_as, 'GpCalendar::Event') }
+           :after_add => proc {|d, c|
+             d.categorizations.where(category_id: c.id, categorized_as: nil).first.update_column(:categorized_as, 'GpCalendar::Event')
+           }
   has_many :marker_categories, :class_name => 'GpCategory::Category', :through => :categorizations,
            :source => :category, :conditions => ["#{GpCategory::Categorization.table_name}.categorized_as = ?", 'Map::Marker'],
-           :after_add => proc {|d, c| d.categorizations.find_by_category_id_and_categorized_as(c.id, nil).update_column(:categorized_as, 'Map::Marker') }
+           :after_add => proc {|d, c|
+             d.categorizations.where(category_id: c.id, categorized_as: nil).first.update_column(:categorized_as, 'Map::Marker')
+           }
   has_and_belongs_to_many :tags, :class_name => 'Tag::Tag', :join_table => 'gp_article_docs_tag_tags',
                           :conditions => proc { self.content.try(:tag_content_tag) ? ['content_id = ?', self.content.tag_content_tag.id] : 'FALSE' }
   has_many :holds, :as => :holdable, :dependent => :destroy
@@ -94,11 +104,6 @@ class GpArticle::Doc < ActiveRecord::Base
   after_save :save_links
 
   attr_accessor :ignore_accessibility_check
-
-  scope :public, where(state: 'public')
-  scope :mobile, lambda {|m| m ? where(terminal_mobile: true) : where(terminal_pc_or_smart_phone: true) }
-  scope :none, where('id IS ?', nil).where('id IS NOT ?', nil)
-  scope :display_published_after, lambda {|date| where(arel_table[:display_published_at].gteq(date)) }
 
   def self.all_with_content_and_criteria(content, criteria)
     docs = self.arel_table
@@ -230,7 +235,7 @@ class GpArticle::Doc < ActiveRecord::Base
               organization_content.related_article_content == content
 
             group = organization_content.groups.where(sys_group_code: creator.group.code).first
-            "#{group.public_uri}#{name}/" if group
+            "#{group.public_uri}docs/#{name}/" if group
           end
     uri ||= "#{node.public_uri}#{name}/"
     without_filename || filename_base == 'index' ? uri : "#{uri}#{filename_base}.html"
@@ -243,7 +248,7 @@ class GpArticle::Doc < ActiveRecord::Base
             organization_content.related_article_content == content
 
             group = organization_content.groups.where(sys_group_code: creator.group.code).first
-            "#{group.public_full_uri}#{name}/" if group
+            "#{group.public_full_uri}docs/#{name}/" if group
           end
     uri ||= "#{node.public_full_uri}#{name}/"
     without_filename || filename_base == 'index' ? uri : "#{uri}#{filename_base}.html"
@@ -416,7 +421,7 @@ class GpArticle::Doc < ActiveRecord::Base
     new_doc.event_categories = self.event_categories
     new_doc.marker_categories = self.marker_categories
     new_doc.categorizations.each do |new_c|
-      self_c = self.categorizations.find_by_category_id_and_categorized_as(new_c.category_id, new_c.categorized_as)
+      self_c = self.categorizations.where(category_id: new_c.category_id, categorized_as: new_c.categorized_as).first
       new_c.update_column(:sort_no, self_c.sort_no)
     end
 
@@ -656,7 +661,7 @@ class GpArticle::Doc < ActiveRecord::Base
 
     errors.add(:name, :invalid) if self.name && self.name !~ /^[\-\w]*$/
 
-    if (doc = self.class.find_by_name_and_state_and_content_id(self.name, self.state, self.content.id))
+    if (doc = self.class.where(name: self.name, state: self.state, content_id: self.content.id).first)
       unless doc.id == self.id || state_archived?
         errors.add(:name, :taken) unless state_public? && prev_edition.try(:state_public?)
       end
@@ -722,7 +727,7 @@ class GpArticle::Doc < ActiveRecord::Base
 
     words = Moji.normalize_zen_han(raw_tags).downcase.split(/[、,]/).map{|w| w.presence }.compact.uniq
     self.tags = words.map do |word|
-        all_tags.find_by_word(word) || all_tags.create(word: word)
+        all_tags.where(word: word).first || all_tags.create(word: word)
       end
     self.tags.each {|t| t.update_last_tagged_at }
 
@@ -779,7 +784,7 @@ class GpArticle::Doc < ActiveRecord::Base
       link.destroy unless lib.detect {|l| l[:body] == link.body && l[:url] == link.url }
     end
     lib.each do |link|
-      links.create(body: link[:body], url: link[:url]) unless links.find_by_body_and_url(link[:body], link[:url])
+      links.create(body: link[:body], url: link[:url]) unless links.where(body: link[:body], url: link[:url]).first
     end
   end
 

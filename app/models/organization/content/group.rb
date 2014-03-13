@@ -32,6 +32,11 @@ class Organization::Content::Group < Cms::Content
               .where(parent_id: 0, level_no: 1).first
   end
 
+  def root_groups
+    sys_group_codes = root_sys_group.children.pluck(:code)
+    groups.where(sys_group_code: sys_group_codes)
+  end
+
   def find_group_by_path_from_root(path_from_root)
     group_names = path_from_root.split('/')
     return nil if group_names.empty?
@@ -69,15 +74,18 @@ class Organization::Content::Group < Cms::Content
     setting_value(:num_docs).to_i
   end
 
-  def category_contents
-    ids = YAML.load(setting_value(:gp_category_content_category_type_ids).presence || '[]')
-    GpCategory::Content::CategoryType.where(id: ids)
+  def category_content
+    GpCategory::Content::CategoryType.where(id: setting_value(:gp_category_content_category_type_id)).first
   end
 
   private
 
   def copy_from_sys_group(sys_group)
-    group = groups.where(sys_group_code: sys_group.code).first_or_create(name: sys_group.code)
+    group = groups.where(sys_group_code: sys_group.code).first_or_create(name: sys_group.name_en)
+    unless group.valid?
+      group.name = "#{sys_group.name_en}_#{sys_group.code}"
+      group.save
+    end
     unless sys_group.children.empty?
       sys_group.children.each do |child|
         next if (sys_group.sites & child.sites).empty?
