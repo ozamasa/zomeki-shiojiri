@@ -13,7 +13,7 @@ class GpCategory::Category < ActiveRecord::Base
   SITEMAP_STATE_OPTIONS = [['表示', 'visible'], ['非表示', 'hidden']]
   DOCS_ORDER_OPTIONS = [['公開日（降順）', 'display_published_at DESC, published_at DESC'], ['公開日（昇順）', 'display_published_at ASC, published_at ASC']]
 
-  default_scope order("#{self.table_name}.category_type_id, #{self.table_name}.parent_id, #{self.table_name}.level_no, #{self.table_name}.sort_no, #{self.table_name}.name")
+  default_scope { order("#{self.table_name}.category_type_id, #{self.table_name}.parent_id, #{self.table_name}.level_no, #{self.table_name}.sort_no, #{self.table_name}.name") }
 
   # Page
   belongs_to :concept, :foreign_key => :concept_id, :class_name => 'Cms::Concept'
@@ -26,7 +26,7 @@ class GpCategory::Category < ActiveRecord::Base
   belongs_to :category_type, :foreign_key => :category_type_id, :class_name => 'GpCategory::CategoryType'
   validates_presence_of :category_type_id
 
-  belongs_to :parent, :foreign_key => :parent_id, :class_name => self.name
+  belongs_to :parent, :foreign_key => :parent_id, :class_name => self.name, :counter_cache => :children_count
   has_many :children, :foreign_key => :parent_id, :class_name => self.name, :dependent => :destroy
 
   validates :name, :presence => true, :uniqueness => {:scope => [:category_type_id, :parent_id]}
@@ -45,7 +45,7 @@ class GpCategory::Category < ActiveRecord::Base
   before_validation :set_attributes_from_parent
 
   scope :public, where(state: 'public')
-  scope :none, where('id IS ?', nil).where('id IS NOT ?', nil)
+  scope :none, -> { where("#{self.table_name}.id IS ?", nil).where("#{self.table_name}.id IS NOT ?", nil) }
 
   def content
     category_type.content
@@ -53,20 +53,20 @@ class GpCategory::Category < ActiveRecord::Base
 
   def descendants(categories=[])
     categories << self
-    children.each {|c| c.descendants(categories) } unless children.empty?
+    children.includes(:children).each {|c| c.descendants(categories) } unless children.empty?
     return categories
   end
 
   def public_descendants(categories=[])
     return categories unless self.public?
     categories << self
-    children.each {|c| c.public_descendants(categories) } unless children.empty?
+    children.includes(:children).each {|c| c.public_descendants(categories) } unless children.empty?
     return categories
   end
 
   def descendants_for_option(categories=[])
     categories << ["#{'　　' * (level_no - 1)}#{title}", id]
-    children.each {|c| c.descendants_for_option(categories) } unless children.empty?
+    children.includes(:children).each {|c| c.descendants_for_option(categories) } unless children.empty?
     return categories
   end
 

@@ -34,4 +34,13 @@ ZomekiCMS::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  config.after_initialize do
+    # https://github.com/flyerhzm/bullet
+#    Bullet.enable = true
+#    Bullet.alert = false
+#    Bullet.bullet_logger = true
+#    Bullet.console = false
+#    Bullet.rails_logger = false
+  end
 end

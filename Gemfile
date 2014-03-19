@@ -7,6 +7,7 @@ gem 'rails', '3.2.17'
 
 gem 'mysql2'
 
+gem 'delayed_job_active_record', '~> 4.0.0'
 gem 'dynamic_form', '~> 1.1.4'
 gem 'galetahub-simple_captcha', '~> 0.1.5', :require => 'simple_captcha'
 gem 'garb', '~> 0.9.1'
@@ -63,6 +64,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'bullet'
   gem 'i18n_generators'
   gem 'rails_best_practices'
   gem 'spring'

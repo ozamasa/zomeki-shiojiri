@@ -27,6 +27,11 @@ namespace :zomeki do
       task(:publish => :environment) do
         Script.run('cms/script/nodes/publish')
       end
+
+      desc 'Publish all nodes'
+      task(:publish_all => :environment) do
+        Script.run('cms/script/nodes/publish?all=all')
+      end
     end
 
     namespace :talks do
@@ -39,7 +44,7 @@ namespace :zomeki do
 end
 
 def clean_feeds
-  Dir["#{Rails.root.join('sites')}/**/index.{atom,rss}"].each do |file|
+  Dir["#{Rails.root.join('sites')}/**/{feed,index}.{atom,rss}"].each do |file|
     info_log "DELETED: #{file}"
     File.delete(file)
   end

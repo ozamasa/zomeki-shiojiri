@@ -5,10 +5,15 @@ class Cms::Script::NodesController < Cms::Controller::Script::Publication
     content_id = params[:target_content_id]
 
     case params[:target_module]
+    when 'cms'
+      if (target_node = Cms::Node.where(id: params[:target_node_id]).first)
+        publish_node(target_node)
+      end
     when 'gp_category'
-      if content_id
-        content = GpCategory::Content::CategoryType.where(id: content_id).first
-        publish_node(content.public_node) if content.try(:public_node)
+      if content_id.present?
+        GpCategory::Content::CategoryType.where(id: content_id).each do |content|
+          publish_node(content.public_node) if content.try(:public_node)
+        end
       else
         GpCategory::Content::CategoryType.all.each do |ct|
           publish_node(ct.public_node) if ct.public_node
@@ -24,6 +29,11 @@ class Cms::Script::NodesController < Cms::Controller::Script::Publication
   end
 
   def publish_node(node)
+    return if params[:all].nil? && node.model.in?('GpCategory::CategoryType')
+
+    started_at = Time.now
+    info_log "Publish node: #{node.model} #{node.name} #{node.title}"
+
     return if @ids.key?(node.id)
     @ids[node.id] = true
 
@@ -70,6 +80,8 @@ class Cms::Script::NodesController < Cms::Controller::Script::Publication
       last_name = child_node.name
       publish_node(child_node)
     end
+
+    info_log "Published node: #{node.model} #{node.name} #{node.title} in #{(Time.now - started_at).round(2)} [secs.]"
   end
 
   def publish_by_task

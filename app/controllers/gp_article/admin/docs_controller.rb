@@ -140,6 +140,8 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
       @item.fix_tmp_files(params[:_tmp])
 
       share_to_sns if @item.state_public?
+
+      publish_related_pages
     end
   end
 
@@ -199,6 +201,8 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
       release_document
 
       share_to_sns if @item.state_public?
+
+      publish_related_pages
     end
   end
 
@@ -228,6 +232,11 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     else
       flash[:alert] = '公開処理に失敗しました。'
     end
+  end
+
+  def close(item)
+    super
+    publish_related_pages
   end
 
   def duplicate(item)
@@ -294,6 +303,8 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
   end
 
   def set_categories
+    @old_category_ids = @item.categories.inject([]){|ids, category| ids | category.ancestors.map(&:id) }
+
     category_ids = if params[:categories].is_a?(Hash)
                      params[:categories].values.flatten.map{|c| c.to_i if c.present? }.compact.uniq
                    else
@@ -311,6 +322,8 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     end
 
     @item.category_ids = category_ids
+
+    @new_category_ids = @item.categories.inject([]){|ids, category| ids | category.ancestors.map(&:id) }
   end
 
   def set_event_categories
@@ -409,6 +422,21 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
       rescue => e
         warn_log %Q!Failed to "#{account.provider}" share: #{e.message}!
       end
+    end
+  end
+
+  def publish_related_pages
+    Delayed::Job.where(queue: ['publish_top_page', 'publish_category_pages']).destroy_all
+
+    if (root_node = @item.content.site.nodes.public.where(parent_id: 0).first) &&
+       (top_page = root_node.children.where(name: 'index.html').first)
+      ::Script.delay(queue: 'publish_top_page')
+              .run("cms/script/nodes/publish?all=all&target_module=cms&target_node_id[]=#{top_page.id}", force: true)
+    end
+
+    if (@old_category_ids.kind_of?(Array) && @new_category_ids.kind_of?(Array))
+      GpCategory::Publisher.register_categories(@old_category_ids | @new_category_ids)
+      GpCategory::Publisher.delay(queue: 'publish_category_pages').publish_categories
     end
   end
 end

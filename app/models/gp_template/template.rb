@@ -7,7 +7,7 @@ class GpTemplate::Template < ActiveRecord::Base
 
   STATE_OPTIONS = [['公開', 'public'], ['非公開', 'closed']]
 
-  default_scope order("#{self.table_name}.sort_no IS NULL, #{self.table_name}.sort_no")
+  default_scope { order("#{self.table_name}.sort_no IS NULL, #{self.table_name}.sort_no") }
 
   belongs_to :content, :foreign_key => :content_id, :class_name => 'GpTemplate::Content::Template'
   validates_presence_of :content_id
@@ -21,7 +21,8 @@ class GpTemplate::Template < ActiveRecord::Base
 
   after_initialize :set_defaults
 
-  scope :public, where(state: 'public')
+  scope :public, -> { where(state: 'public') }
+  scope :none, -> { where("#{self.table_name}.id IS ?", nil).where("#{self.table_name}.id IS NOT ?", nil) }
 
   def public_items
     items.public
