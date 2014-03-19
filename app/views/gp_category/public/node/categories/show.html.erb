@@ -1,16 +1,16 @@
 <div class="contentGpCategory contentGpCategoryCategory">
-  <%- unless @category.public_children.empty? -%>
+  <%#- unless @category.public_children.empty? -%>
   <section class="categoryType categories">
     <h2><%= @category.title %></h2>
     <nav>
       <ul>
-        <%- @category.public_children.each do |child| -%>
+        <%- (@category.public_children.empty? ? @category.parent : @category).public_children.each do |child| -%>
         <li class="category<%= child.name.try(:camelize) %>"><%= link_to child.title, child.public_uri %></li>
         <%- end -%>
       </ul>
     </nav>
   </section>
-  <%- end -%>
+  <%#- end -%>
 
   <%- unless @docs.empty? -%>
   <section class="categoryType docs">
