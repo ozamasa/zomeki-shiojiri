@@ -35,7 +35,7 @@
         <tr>
           <th><%= f.label :title_kana %></th>
           <td><%= f.text_field :title_kana, :style => 'width: 440px;' %></td>
-          <td><%= f.select :title_column, options_for_select([['ア行','ア'],['カ行','カ'],['サ行','サ'],['タ行','タ'],['ナ行','ナ'],['ハ行','ハ'],['マ行','マ'],['ヤ行','ヤ'],['ラ行','ラ'],['ワ行','ワ']]), include_blank: true %></td>
+          <td><%= f.select :title_column, options_for_select([['ア行','ア'],['カ行','カ'],['サ行','サ'],['タ行','タ'],['ナ行','ナ'],['ハ行','ハ'],['マ行','マ'],['ヤ行','ヤ'],['ラ行','ラ'],['ワ行','ワ']], @item.title_column), include_blank: true %></td>
         </tr>
         <tr>
           <th><%= f.label :href %></th>
