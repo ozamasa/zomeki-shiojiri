@@ -4,8 +4,11 @@
     <h2><%= @category.title %></h2>
     <nav>
       <ul>
-        <%- (@category.public_children.empty? ? @category.parent : @category).public_children.each do |child| -%>
+        <%- public_children = (@category.public_children.empty? ? @category.parent : @category).public_children rescue nil -%>
+        <%- if public_children -%>
+        <%- public_children.each do |child| -%>
         <li class="category<%= child.name.try(:camelize) %>"><%= link_to child.title, child.public_uri %></li>
+        <%- end -%>
         <%- end -%>
       </ul>
     </nav>
