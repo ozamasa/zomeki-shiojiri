@@ -9,7 +9,7 @@
     <ul>
     <% kana_sav = kana_doc -%>
     <% end -%>
-    <li><%= content_tag(:span, link_to(doc.title, doc.public_uri), class: 'title') %><%#= doc_replace(doc, @content.list_style, @content.date_style, @content.time_style) %></li>
+    <li><span class="title"><%= link_to(doc.title, doc.public_uri) %></span></li>
     <% end -%>
     <%= '</ul>'.html_safe unless @docs.empty? %>
   </div>
