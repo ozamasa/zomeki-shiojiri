@@ -9,22 +9,18 @@ class Rank::Total < ActiveRecord::Base
     self[:page_title].gsub(' | ' + Core.site.name, '')
   end
 
-  def image_tag
+  def image_url
+    url = ''
     Cms::Node.where(state: 'public', model: 'GpArticle::Doc').each do |node|
       doc = node.content.public_docs.find_by_name(page_path.split('/')[-1])
       if doc
-        tag = ''
-        image_file = doc.image_files.detect{|f| f.name == doc.list_image } || doc.image_files.first if doc.list_image.present?
-        doc_image = if image_file
-                      tag = ActionController::Base.helpers.image_tag("#{doc.public_uri(without_filename: true)}file_contents/#{image_file.name}")
-                    else
-                      unless (img_tags = Nokogiri::HTML.parse(doc.body).css('img[src^="file_contents/"]')).empty?
-                        filename = ::File.basename(img_tags.first.attributes['src'].value) rescue nil
-                        tag = ActionController::Base.helpers.image_tag("#{doc.public_uri(without_filename: true)}file_contents/#{filename}") unless filename.blank?
-                      end
-                    end
-        return tag
+        unless (img_tags = Nokogiri::HTML.parse(doc.body).css('img[src^="file_contents/"]')).empty?
+          filename = ::File.basename(img_tags.first.attributes['src'].value) rescue nil
+          url = "#{doc.public_uri(without_filename: true)}file_contents/#{filename}" unless filename.blank?
+        end
+        break unless url.blank?
       end
     end
+    return url
   end
 end
