@@ -97,7 +97,7 @@ font-size: 11px;
 }
 </style>
 
-<%#= link_to 'OAuth認証', '/_auth/facebook' %>
+<%= link_to "OAuth認証", "/_auth/facebook?origin=#{item.public_uri}" %>
 
 <%= form_tag "#{item.public_uri}comments/confirm" do -%>
 <input type="hidden" name="comment[author_name]" value="<%= @comment.author_name %>">
