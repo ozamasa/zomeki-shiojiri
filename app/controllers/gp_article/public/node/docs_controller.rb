@@ -63,6 +63,12 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
                    @item.mobile_title.presence || @item.title
                  end
 
+    if @content.blog_functions[:comment]
+      @comment = @item.comments.build
+      @comment.author_name = "テストユーザー"
+      @comment.author_url  = "https://www.facebook.com/konkon.jp"
+    end
+
     read_to_session
   end
 

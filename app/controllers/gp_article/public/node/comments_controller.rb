@@ -43,7 +43,8 @@ class GpArticle::Public::Node::CommentsController < Cms::Controller::Public::Bas
     @comment.state = (@content.blog_functions[:comment_open] ? GpArticle::Comment::STATE_OPTIONS.first
                                                              : GpArticle::Comment::STATE_OPTIONS.last).last
 
-    if simple_captcha_valid?
+#    if simple_captcha_valid?
+    if true
       if @comment.save
         CommonMailer.commented_notification(@comment).deliver if @content.blog_functions[:comment_notification_mail]
         redirect_to @doc.public_full_uri

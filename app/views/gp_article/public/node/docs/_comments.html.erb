@@ -1,22 +1,147 @@
-<div id="comments" class="comments">
-  <%- unless item.public_comments.empty? -%>
-  <h2>コメント</h2>
-  <div class="commentsBody">
-    <%- item.public_comments.each do |comment| -%>
-    <div class="comment">
-      <div class="body"><%=simple_format comment.body %></div>
-      <div class="commentNavi">
-        <span class="author"><%= comment.author_name %></span>
-        <span class="date">
-          <%= comment.posted_at.strftime(localize_wday(@content.date_style, comment.posted_at.wday)) %>
-          <%= comment.posted_at.strftime(@content.time_style) %>
-        </span>
+<style>
+.fbFeedbackContent {
+background-color: transparent;
+background-color: rgba(190, 190, 190, .2);
+border: solid #e9e9e9;
+border-width: 1px 0;
+padding: 7px 10px 7px 69px;
+position: relative;
+}
+.fbFeedbackContent .mentionsTextarea{
+border-width: 0;
+padding: 0;
+margin: 0;
+background-color: transparent;
+}
+
+.uiTypeahead .textInput {
+outline: 0;
+width: 100%;
+}
+.uiMentionsInput .mentionsTextarea {
+line-height: 1.28;
+background: transparent;
+zoom: 1;
+}
+.uiTextareaAutogrow {
+overflow: hidden;
+}
+.uiTextareaNoResize {
+resize: none;
+}
+textarea {
+max-width: 100%;
+border: 1px solid #bdc7d8;
+margin: 0;
+padding: 3px;
+}
+.fbFeedbackContent .post {
+margin-top: 4px;
+}
+.prs {
+padding-right: 5px;
+}
+._4bl7 {
+word-wrap: break-word;
+float: left;
+min-height: 1px;
+}
+.commentas_inner {
+display: block;
+padding-top: 4px;
+}
+._ohf {
+float: right;
+}
+
+.fbFeedbackPost {
+position: relative;
+}
+ul {
+list-style-type: none;
+margin: 0;
+padding: 0;
+}
+.fbFeedbackContent .fbFeedbackPost {
+border: solid #e2e2e2;
+border-width: 1px 0 0;
+clear: both;
+padding-bottom: 0 !important;
+padding-top: 10px;
+}
+._4kg>li {
+border-width: 1px 0 0 0;
+}
+._29k {
+display: table-cell;
+vertical-align: top;
+width: 10000px;
+}
+.fcb {
+color: #333;
+}
+.fwb {
+font-weight: bold;
+}
+.fbFeedbackPost .fsm {
+font-size: 12px;
+}
+.fcg {
+color: gray;
+}
+.fwn {
+font-weight: normal;
+}
+.fsm {
+font-size: 11px;
+}
+</style>
+
+<%#= link_to 'OAuth認証', '/_auth/facebook' %>
+
+<%= form_tag "#{item.public_uri}comments/confirm" do -%>
+<input type="hidden" name="comment[author_name]" value="<%= @comment.author_name %>">
+<input type="hidden" name="comment[author_url]"  value="<%= @comment.author_url %>">
+<div class="commentPost">
+  <div class="uiTypeahead">
+    <div class="wrap">
+      <div class="innerWrap">
+        <textarea class="uiTextareaNoResize uiTextareaAutogrow input mentionsTextarea textInput" title="コメントを追加..." required="1" placeholder="コメントを追加..." name="comment[body]" role="textbox" aria-autocomplete="list" autocomplete="off" aria-expanded="false" aria-owns="typeahead_list_u_0_5" aria-haspopup="true" id="u_0_6"></textarea>
       </div>
     </div>
-    <%- end -%>
   </div>
-  <%- end -%>
-
-  <h2>コメントの投稿</h2>
-  <%= render (Page.mobile? ? 'comment_form_mobile' : 'comment_form'), item: item %>
+  <div class="post">
+    <div class="_ohf">
+      <div class="_4bl7 prs">
+        <div class="commentas">
+          <span class="commentas_inner"><span class="commentasName"><%= @comment.author_name %></span>さんとして投稿する</span>
+        </div>
+      </div>
+      <div class="_4bl7">
+        <input value="コメントする" type="submit" id="u_0_3">
+      </div>
+    </div>
+  </div>
 </div>
+<%- end -%>
+
+<br>
+<br>
+
+<%- unless item.public_comments.empty? -%>
+<div id="comments" class="comments">
+  <ul class="_4kg">
+  <%- item.public_comments.each do |comment| -%>
+    <li class="fbFeedbackPost">
+      <div class="_29k">
+        <a class="profileName fwb" target="_blank" href="<%= comment.author_url %>"><%= comment.author_name %></a>
+        <div class="postContent fsm fwn fcg">
+          <div class="postText"><%=simple_format comment.body %></div>
+          <abbr><%= comment.posted_at.strftime('%-m月%d日 %H:%M') %></abbr>
+        </div>
+      </div>
+    </li>
+  <%- end -%>
+  </ul>
+</div>
+<%- end -%>
