@@ -64,14 +64,12 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
                  end
 
     if @content.blog_functions[:comment]
-      auth = request.env["omniauth.auth"]
-      if auth['provider'] == 'facebook'
-logger.info auth
-      end
 
       @comment = @item.comments.build
-      @comment.author_name = "テストユーザー"
-      @comment.author_url  = "https://www.facebook.com/konkon.jp"
+      if session[:info_name].present?
+        @comment.author_name = session[:info_name]
+        @comment.author_url  = session[:info_url]
+      end
     end
 
     read_to_session

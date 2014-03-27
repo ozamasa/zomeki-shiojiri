@@ -23,6 +23,9 @@ class Cms::Public::OAuthController < ApplicationController
               credential_token:      oa_auth.credentials.token,
               credential_expires_at: oa_auth.credentials.expires_at}
 
+      session[:info_name] = auth[:info_name]
+      session[:info_url]  = auth[:info_url]
+
       begin
         query = CGI.escape('SELECT name FROM profile WHERE id = me()')
         path = "/method/fql.query?format=JSON&access_token=#{auth[:credential_token]}&query=#{query}"
@@ -84,7 +87,7 @@ class Cms::Public::OAuthController < ApplicationController
 
           return redirect_to(oa_params['return_to'])
         else
-          return redirect_to(request.base_url)
+          return redirect_to(back_to(request.env['omniauth.origin']) || request.base_url)
         end
       end
     when 'twitter'
@@ -115,8 +118,24 @@ class Cms::Public::OAuthController < ApplicationController
     end
   end
 
+  def destroy
+    session[:info_name] = nil
+    session[:info_url]  = nil
+    return redirect_to(back_to(params['origin']) || request.base_url)
+  end
+
   def failure
     warn_log params.inspect
     redirect_to request.base_url
+  end
+
+private
+  def back_to(origin)
+    if origin.presence && back_to = CGI.unescape(origin.to_s)
+      uri = URI.parse(back_to)
+      return back_to if uri.relative? || uri.host == request.host
+    end
+  rescue
+    nil
   end
 end
