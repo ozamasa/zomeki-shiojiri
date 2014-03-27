@@ -97,13 +97,15 @@ font-size: 11px;
 }
 </style>
 
+<div class="commentPost">
 <% if @comment.author_name.blank? %>
-<%= link_to "ログイン", "/_auth/facebook?origin=#{item.public_uri}" %>
+  <div class="uiTypeahead">
+  <%= link_to "ログイン", "/_auth/facebook?origin=#{item.public_uri}" %>
+  </div>
 <% else -%>
 <%= form_tag "#{item.public_uri}comments/confirm" do -%>
 <input type="hidden" name="comment[author_name]" value="<%= @comment.author_name %>">
 <input type="hidden" name="comment[author_url]"  value="<%= @comment.author_url %>">
-<div class="commentPost">
   <div class="uiTypeahead">
     <div class="wrap">
       <% if flash[:notice] %><div class="notice"><%= flash[:notice] %></div><% end %>
@@ -124,12 +126,9 @@ font-size: 11px;
       </div>
     </div>
   </div>
+<%- end -%>
+<%- end -%>
 </div>
-<%- end -%>
-<%- end -%>
-
-<br>
-<br>
 
 <%- unless item.public_comments.empty? -%>
 <div id="comments" class="comments">
