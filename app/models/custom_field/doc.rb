@@ -5,6 +5,7 @@ class CustomField::Doc < ActiveRecord::Base
   # Content
   belongs_to :content, foreign_key: :content_id, class_name: 'CustomField::Content::Doc'
   validates_presence_of :content_id, :title
+  validates_presence_of :content_id, :title_kana
 
   has_many :fields, foreign_key: :custom_field_doc_id,  class_name: 'CustomField::DocField', dependent: :destroy
   has_many :forms,  foreign_key: :custom_field_form_id, class_name: 'CustomField::Form', through: :fields, order: :sort_no
@@ -16,5 +17,4 @@ class CustomField::Doc < ActiveRecord::Base
     	gparticle.docs.find(gp_article_doc_id) rescue nil
     end
   end
-
 end
