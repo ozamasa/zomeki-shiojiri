@@ -8,12 +8,8 @@
     <td><%= @item.title %></td>
   </tr>
   <tr>
-    <th><%= @item.class.human_attribute_name :type %></th>
-    <td><%=raw @item.type %></td>
-  </tr>
-  <tr>
     <th><%= @item.class.human_attribute_name :style %></th>
-    <td><%=raw @item.style %></td>
+    <td><%=raw @item.style == "require" ? "必須" : "必須でない" %></td>
   </tr>
   <tr>
     <th><%= @item.class.human_attribute_name :sort_no %></th>

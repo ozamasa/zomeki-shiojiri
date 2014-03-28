@@ -10,12 +10,8 @@
     <td><%= f.text_field :title, :class => 'title' %></td>
   </tr>
   <tr>
-    <th><%= f.label :type %></th>
-    <td><%= f.text_field :type, :class => 'type' %></td>
-  </tr>
-  <tr>
     <th><%= f.label :style %></th>
-    <td><%= f.text_field :style, :class => 'style' %></td>
+    <td><%= f.radio_buttons :style, [["必須","require"],["必須でない","option"]], :class => 'style' %></td>
   </tr>
   <tr>
     <th><%= f.label :sort_no %></th>

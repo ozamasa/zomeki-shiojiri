@@ -3,7 +3,7 @@
     <th style="text-align: center; width: 60px;">詳細</th>
     <th style="text-align: center; width: 200px;"><%= CustomField::Form.human_attribute_name :name %></th>
     <th style="text-align: center; width: 200px;"><%= CustomField::Form.human_attribute_name :title %></th>
-    <th style="text-align: center; width: 200px;"><%= CustomField::Form.human_attribute_name :type %></th>
+    <th style="text-align: center; width: 200px;"><%= CustomField::Form.human_attribute_name :style %></th>
     <th style="text-align: center; width: 60px;"><%= CustomField::Form.human_attribute_name :sort_no %></th>
   </tr>
   <%- @items.each do |item| -%>
@@ -11,7 +11,7 @@
     <td style="text-align: center;"><%= link_to :show, custom_field_form_path(content: @content, id: item.id) %></td>
     <td style="text-align: left;"><%= item.name %></td>
     <td style="text-align: left;"><%= item.title %></td>
-    <td style="text-align: left;"><%= item.type %></td>
+    <td style="text-align: left;"><%= item.style == "require" ? "必須" : "" %></td>
     <td style="text-align: right;"><%= item.sort_no %></td>
   </tr>
   <%- end -%>

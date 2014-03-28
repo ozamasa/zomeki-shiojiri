@@ -4,11 +4,12 @@ ja:
       custom_field/form: カスタムフィールド
       custom_field/doc: 記事
     attributes:
+      value: カスタムフィールド
       custom_field/form:
         name: フィールド名
         title: タイトル
         type: 表示形式
-        style: スタイルシート
+        style: 必須
         sort_no: 並び順
         created_at: 作成日時
       custom_field/doc:
