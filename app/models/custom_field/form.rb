@@ -11,4 +11,16 @@ class CustomField::Form < ActiveRecord::Base
 
   has_one :field, foreign_key: :custom_field_form_id,  class_name: 'CustomField::DocField', dependent: :destroy
 
+  def editable?
+    true
+  end
+
+  def creatable?
+    editable?
+  end
+
+  def deletable?
+    editable?
+  end
+
 end
