@@ -11,8 +11,8 @@
   </tr>
 <% @fields.each do |field| -%>
   <tr>
-    <th><%= field.title %><%= field.style == "require" ? raw(' <span class="note">※</span>') : '' %></th>
-    <td><%= text_field_tag "[item][field][#{field.id}]", (@item.fields.find_by_custom_field_form_id(field.id)[:value] rescue nil), style: 'width: 600px;' %></td>
+    <th><%= raw("<div class='field_with_errors'>") if @item.validate_field_errors && @item.validate_field_errors.include?(field.id) %><%= field.title %><%= raw("</div>") if @item.validate_field_errors && @item.validate_field_errors.include?(field.id) %><%= field.style == "require" ? raw(' <span class="note">※</span>') : '' %></th>
+    <td><%= raw("<div class='field_with_errors'>") if @item.validate_field_errors && @item.validate_field_errors.include?(field.id) %><%= text_field_tag "[item][field][#{field.id}]", (@item.new_record? ? params[:item][:field][field.id.to_s] : @item.fields.find_by_custom_field_form_id(field.id)[:value] rescue nil), style: 'width: 600px;' %><%= raw("</div>") if @item.validate_field_errors && @item.validate_field_errors.include?(field.id) %></td>
   </tr>
 <% end -%>
 </table>

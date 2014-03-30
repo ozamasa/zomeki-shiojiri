@@ -32,17 +32,17 @@ class CustomField::Admin::DocsController < Cms::Controller::Admin::Base
   def create
     @item = @content.docs.new(content_id: @content.id, title: params[:item][:title], title_kana: params[:item][:title_kana])
     params[:item][:field].each do |field|
-      @item.fields.new(content_id: @content.id, custom_field_doc_id: @item.id, custom_field_form_id: field.first, value: field.last)
+      @item.fields.build(content_id: @content.id, custom_field_doc_id: @item.id, custom_field_form_id: field.first, value: field.last)
     end
     _create @item
   end
 
   def update
     @item = @content.docs.find(params[:id])
-    @item.update_attributes(title: params[:item][:title], title_kana: params[:item][:title_kana])
     params[:item][:field].each do |field|
       @item.fields.find_by_content_id_and_custom_field_doc_id_and_custom_field_form_id(@content.id, @item.id, field.first).update_attributes(value: field.last) rescue nil
     end
+    @item.update_attributes(title: params[:item][:title], title_kana: params[:item][:title_kana])
     _update @item
   end
 
