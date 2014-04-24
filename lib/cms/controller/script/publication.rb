@@ -2,31 +2,33 @@ require 'timeout'
 class Cms::Controller::Script::Publication < ApplicationController
   include Cms::Controller::Layout
   before_filter :initialize_publication
-  
+
   def self.publishable?
     true
   end
-  
+
   def initialize_publication
     if @node = params[:node]
       @site   = @node.site
     end
     @errors = []
   end
-  
+
   def publish_page(item, params = {})
+    return
+
     if Script.options
       path = params[:uri].to_s.sub(/\?.*/, '')
       return false if Script.options.is_a?(Array) && !Script.options.include?(path)
       return false if Script.options.is_a?(Regexp) && Script.options !~ path
     end
-    
+
     site = params[:site] || @site
     res  = item.publish_page(render_public_as_string(params[:uri], :site => site),
       :path => params[:path], :dependent => params[:dependent])
     return false unless res
     #return true if params[:path] !~ /(\/|\.html)$/
-    
+
     ## ruby html
     uri = params[:uri]
     if uri =~ /\.html$/
@@ -40,11 +42,11 @@ class Cms::Controller::Script::Publication < ApplicationController
     else
       return true
     end
-    
+
     #uri  = (params[:uri] =~ /\.html$/ ? "#{params[:uri]}.r" : "#{params[:uri]}index.html.r")
     path = (params[:path] =~ /\.html$/ ? "#{params[:path]}.r" : "#{params[:path]}index.html.r")
     dep  = params[:dependent] ? "#{params[:dependent]}/ruby" : "ruby"
-    
+
     ruby = nil
     if item.published?
       ruby = true
@@ -53,7 +55,7 @@ class Cms::Controller::Script::Publication < ApplicationController
     elsif ::File.stat(path).mtime < Cms::KanaDictionary.dic_mtime
       ruby = true
     end
-    
+
     if ruby
       begin
         timeout(60) do
@@ -66,13 +68,13 @@ class Cms::Controller::Script::Publication < ApplicationController
         puts "#{e}"
       end
     end
-    
+
     return res
   rescue => e
     puts "Error: #{e}"
     return false
   end
-  
+
   def publish_more(item, params = {})
     stopp = nil
     limit = Zomeki.config.application["cms.publish_more_pages"].to_i rescue 0
@@ -80,7 +82,7 @@ class Cms::Controller::Script::Publication < ApplicationController
     file  = params[:file] || 'index'
     first = params[:first] || 1
     first.upto(limit) do |p|
-      page = (p == 1 ? "" : ".p#{p}") 
+      page = (p == 1 ? "" : ".p#{p}")
       uri  = "#{params[:uri]}#{file}#{page}.html"
       path = "#{params[:path]}#{file}#{page}.html"
       dep  = "#{params[:dependent]}#{page}"
@@ -91,7 +93,7 @@ class Cms::Controller::Script::Publication < ApplicationController
       end
       #return item.published? ## file updated
     end
-    
+
     ## remove over files
     first = stopp ? stopp : (limit + 1)
     first.upto(9999) do |p|
