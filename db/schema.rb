@@ -604,6 +604,35 @@ ActiveRecord::Schema.define(:version => 20140509083136) do
 
   add_index "cms_talk_tasks", ["unid", "dependent"], :name => "unid"
 
+  create_table "custom_field_doc_fields", :force => true do |t|
+    t.integer  "content_id"
+    t.integer  "custom_field_doc_id"
+    t.integer  "custom_field_form_id"
+    t.string   "value"
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
+  end
+
+  create_table "custom_field_docs", :force => true do |t|
+    t.integer  "content_id"
+    t.integer  "gp_article_doc_id"
+    t.string   "title"
+    t.string   "title_kana"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  create_table "custom_field_forms", :force => true do |t|
+    t.integer  "content_id"
+    t.string   "name"
+    t.string   "title"
+    t.string   "type"
+    t.string   "style"
+    t.integer  "sort_no"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
     t.integer  "attempts",   :default => 0, :null => false
@@ -758,7 +787,9 @@ ActiveRecord::Schema.define(:version => 20140509083136) do
     t.string   "body_more_link_text"
     t.boolean  "feature_1"
     t.boolean  "feature_2"
+    t.string   "title_kana"
     t.string   "filename_base"
+    t.string   "title_column"
   end
 
   add_index "gp_article_docs", ["concept_id"], :name => "index_gp_article_docs_on_concept_id"
