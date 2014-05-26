@@ -9,6 +9,7 @@ class GpArticle::Content::Doc < Cms::Content
   TAG_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
   SNS_SHARE_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
   BLOG_FUNCTIONS_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
+  BROKEN_LINK_NOTIFICATION_OPTIONS = [['通知する', 'enabled'], ['通知しない', 'disabled']]
 
   default_scope { where(model: 'GpArticle::Doc') }
 
@@ -233,6 +234,21 @@ class GpArticle::Content::Doc < Cms::Content
     Organization::Content::Group.find_by_id(setting_value(:organization_content_group_id))
   end
 
+  def notify_broken_link?
+    setting_value(:broken_link_notification) == 'enabled'
+  end
+
+  def rewrite_configs
+    if node = public_node
+      line = ["RewriteRule ^#{node.public_uri}",
+              '((\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d).*)',
+              " #{public_path.gsub(/.*(\/_contents\/)/, '\\1')}/#{node.name}/$2/$3/$4/$5/$6/$1 [L]"].join
+      [line]
+    else
+      []
+    end
+  end
+
   private
 
   def set_default_settings
@@ -248,5 +264,6 @@ class GpArticle::Content::Doc < Cms::Content
     in_settings[:tag_relation] = TAG_RELATION_OPTIONS.first.last unless setting_value(:tag_relation)
     in_settings[:sns_share_relation] = SNS_SHARE_RELATION_OPTIONS.first.last unless setting_value(:sns_share_relation)
     in_settings[:blog_functions] = BLOG_FUNCTIONS_OPTIONS.last.last unless setting_value(:blog_functions)
+    in_settings[:broken_link_notification] = BROKEN_LINK_NOTIFICATION_OPTIONS.first.last unless setting_value(:broken_link_notification)
   end
 end

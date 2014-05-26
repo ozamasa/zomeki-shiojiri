@@ -225,7 +225,8 @@ class GpArticle::Doc < ActiveRecord::Base
     else
       _name = ::File.join(name[0..0], name[0..1], name[0..2], name)
     end
-    "#{content.public_path}/docs/#{_name}/#{filename_base}.html"
+    node_name = content.public_node.try(:name) || 'docs'
+    "#{content.public_path}/#{node_name}/#{_name}/#{filename_base}.html"
   end
 
   def public_uri(without_filename: false)
@@ -319,6 +320,13 @@ class GpArticle::Doc < ActiveRecord::Base
     self.state = 'public' unless self.state_public?
     return false unless save(:validate => false)
     publish_page(content, path: public_path, uri: public_uri)
+  end
+
+  def rebuild(content, options={})
+    return false unless self.state_public?
+    @save_mode = :publish
+    publish_page(content, options)
+    publish_files
   end
 
   def bread_crumbs(doc_node)
@@ -649,6 +657,10 @@ class GpArticle::Doc < ActiveRecord::Base
 
   def feature_2_text
     FEATURE_2_OPTIONS.detect{|o| o.last == self.feature_2 }.try(:first).to_s
+  end
+
+  def public_files_path
+    "#{::File.dirname(public_path)}/file_contents"
   end
 
   private
