@@ -8,6 +8,9 @@ class Organization::Admin::Tool::GroupsController < Cms::Controller::Admin::Base
     content.groups.each do |group|
       begin
         if group.rebuild(render_public_as_string("#{group.public_uri}index.html", site: content.site))
+          rendered = render_public_as_string("#{group.public_uri}index.html", site: content.site, jpmobile: envs_to_request_as_smart_phone)
+          group.publish_page(rendered, path: group.public_smart_phone_path)
+
           results[:ok] += 1
         end
       rescue => e
