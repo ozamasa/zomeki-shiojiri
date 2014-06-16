@@ -25,11 +25,14 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
 
   def index
     @docs = public_or_preview_docs.order('display_published_at DESC, published_at DESC')
-    if params[:format].in?('rss', 'atom')
+    if params[:format].in?('rss', 'atom', 'json')
       @docs = @docs.display_published_after(@content.feed_docs_period.to_i.days.ago) if @content.feed_docs_period.present?
       @docs = @docs.reject{|d| d.will_be_replaced? } unless Core.publish
       @docs = @docs.paginate(page: params[:page], per_page: @content.feed_docs_number)
-      return render_feed(@docs)
+      respond_to do |format|
+        format.json {return render json: @docs}
+        format.any  {return render_feed(@docs)}
+      end
     end
     @docs = @docs.includes(:next_edition).reject{|d| d.will_be_replaced? } unless Core.publish
     @docs = @docs.paginate(page: params[:page], per_page: 20)
