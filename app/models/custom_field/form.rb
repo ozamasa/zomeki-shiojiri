@@ -11,6 +11,9 @@ class CustomField::Form < ActiveRecord::Base
 
   has_one :field, foreign_key: :custom_field_form_id,  class_name: 'CustomField::DocField', dependent: :destroy
 
+  STYLE_OPTIONS = [['必須','require'],['必須でない','option']]
+  METHOD_OPTIONS = [['テキストフィールド','text'],['テキストエリア','text_area'],['プルダウン','select'],['ラジオボタン','radio_buttons'],['チェックボックス','check_boxs']]
+
   def editable?
     true
   end
@@ -23,4 +26,11 @@ class CustomField::Form < ActiveRecord::Base
     editable?
   end
 
+  def show_style
+    STYLE_OPTIONS.detect{|to| to.last == self.style }.try(:first)
+  end
+
+  def show_input_method
+    METHOD_OPTIONS.detect{|to| to.last == self.input_method }.try(:first)
+  end
 end

@@ -9,10 +9,18 @@
   </tr>
   <tr>
     <th><%= @item.class.human_attribute_name :style %></th>
-    <td><%=raw @item.style == "require" ? "必須" : "必須でない" %></td>
+    <td><%= @item.show_style %></td>
   </tr>
   <tr>
     <th><%= @item.class.human_attribute_name :sort_no %></th>
     <td><%=raw @item.sort_no %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :input_method %></th>
+    <td><%= @item.show_input_method %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :input_option %></th>
+    <td><%=simple_format @item.input_option %></td>
   </tr>
 </table>

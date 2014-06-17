@@ -11,6 +11,8 @@ ja:
         type: 表示形式
         style: 必須
         sort_no: 並び順
+        input_method: 入力方法
+        input_option: 項目
         created_at: 作成日時
       custom_field/doc:
         title: タイトル
