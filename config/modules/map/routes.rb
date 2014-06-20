@@ -1,6 +1,9 @@
 ZomekiCMS::Application.routes.draw do
   mod = 'map'
 
+  ## script
+  get "/_script/#{mod}/script/markers/publish" => "#{mod}/script/markers#publish"
+
   ## admin
   scope "#{ZomekiCMS::ADMIN_URL_PREFIX}/#{mod}", :module => mod, :as => mod do
     resources :content_base,
@@ -43,6 +46,7 @@ ZomekiCMS::Application.routes.draw do
 
   ## public
   scope "_public/#{mod}", :module => mod, :as => '' do
+    match 'node_markers/index_:escaped_category' => 'public/node/markers#index'
     match 'node_markers(/index)' => 'public/node/markers#index'
     match 'node_markers/:name/file_contents/:basename.:extname' => 'public/node/markers#file_content', :format => false
     match 'node_navigations(/index)' => 'public/node/navigations#index'

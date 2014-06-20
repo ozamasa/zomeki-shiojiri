@@ -17,12 +17,12 @@ class Cms::Controller::Script::Publication < ApplicationController
   def publish_page(item, params = {})
     return
 
-    Script.current
+    ::Script.current
 
     if ::Script.options
       path = params[:uri].to_s.sub(/\?.*/, '')
-      return false if Script.options.is_a?(Array) && !Script.options.include?(path)
-      return false if Script.options.is_a?(Regexp) && Script.options !~ path
+      return false if ::Script.options.is_a?(Array) && !::Script.options.include?(path)
+      return false if ::Script.options.is_a?(Regexp) && ::Script.options !~ path
     end
 
     site = params[:site] || @site
@@ -33,11 +33,16 @@ class Cms::Controller::Script::Publication < ApplicationController
     #return true if params[:path] !~ /(\/|\.html)$/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     Script.success if item.published?
+=======
+    ::Script.success if item.published?
+>>>>>>> 6b044ab369192711400af98fe1e26721ad3ca900
 
 >>>>>>> a85fb5bd1972aba57b69cdcfd0d93b2bd094bc71
     ## ruby html
+    return true unless Zomeki.config.application['cms.use_kana']
     uri = params[:uri]
     if uri =~ /\.html$/
       uri += ".r"
@@ -71,22 +76,22 @@ class Cms::Controller::Script::Publication < ApplicationController
           item.publish_page(rendered, :path => path, :dependent => dep)
         end
       rescue TimeoutError => e
-        Script.error "#{uri} Timeout"
+        ::Script.error "#{uri} Timeout"
       rescue => e
-        Script.error "#{uri}\n#{e.message}"
+        ::Script.error "#{uri}\n#{e.message}"
       end
     end
 
     return res
   rescue => e
-    Script.error "#{uri}\n#{e.message}"
+    ::Script.error "#{uri}\n#{e.message}"
     error_log e.message
     return false
   end
 
   def publish_more(item, params = {})
     stopp = nil
-    limit = Zomeki.config.application["cms.publish_more_pages"].to_i rescue 0
+    limit = params[:limit] || Zomeki.config.application["cms.publish_more_pages"].to_i rescue 0
     limit = (limit < 1 ? 1 : 1 + limit)
     file  = params[:file] || 'index'
     first = params[:first] || 1

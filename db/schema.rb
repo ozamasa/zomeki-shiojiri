@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140616082717) do
+ActiveRecord::Schema.define(:version => 20140620015953) do
 
   create_table "ad_banner_banners", :force => true do |t|
     t.string   "name"
@@ -366,6 +366,7 @@ ActiveRecord::Schema.define(:version => 20140616082717) do
 
   create_table "cms_kana_dictionaries", :force => true do |t|
     t.integer  "unid"
+    t.integer  "site_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"
@@ -1577,6 +1578,7 @@ ActiveRecord::Schema.define(:version => 20140616082717) do
   add_index "sys_object_privileges", ["item_unid", "action"], :name => "item_unid"
 
   create_table "sys_operation_logs", :force => true do |t|
+    t.integer  "site_id"
     t.integer  "loggable_id"
     t.string   "loggable_type"
     t.integer  "user_id"
@@ -1631,6 +1633,7 @@ ActiveRecord::Schema.define(:version => 20140616082717) do
   add_index "sys_recognitions", ["user_id"], :name => "user_id"
 
   create_table "sys_role_names", :force => true do |t|
+    t.integer  "site_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"

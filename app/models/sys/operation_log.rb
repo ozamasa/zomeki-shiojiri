@@ -3,11 +3,17 @@ class Sys::OperationLog < ActiveRecord::Base
 
   default_scope order('updated_at DESC')
 
+  ACTION_OPTIONS = [["作成","create"], ["更新","update"], ["承認","recognize"], ["削除","destroy"], ["公開","publish"], ["非公開","close"], ["ログイン","login"], ["ログアウト","logout"]]
+
   belongs_to :loggable, :polymorphic => true
   belongs_to :user, :class_name => 'Sys::User'
 
   validates :loggable, :presence => true
   validates :user, :presence => true
+
+  def action_text
+    ACTION_OPTIONS.detect{|o| o.last == action }.try(:first).to_s
+  end
 
   def self.log(request, options = {})
     params = request.params
@@ -17,6 +23,7 @@ class Sys::OperationLog < ActiveRecord::Base
     log.action    = params[:do]
     log.action    = params[:action] if params[:do].blank?
     log.ipaddr    = request.remote_addr
+    log.site_id   = Core.site.id rescue 0
 
     if user = options[:user]
       log.user_id   = user.id
@@ -25,6 +32,7 @@ class Sys::OperationLog < ActiveRecord::Base
       log.user_id   = user.id
       log.user_name = user.name
     end
+
 
     if item = options[:item]
       log.item_model  = item.class.to_s
