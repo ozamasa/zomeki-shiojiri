@@ -32,15 +32,8 @@ class Cms::Controller::Script::Publication < ApplicationController
     return false unless res
     #return true if params[:path] !~ /(\/|\.html)$/
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    Script.success if item.published?
-=======
     ::Script.success if item.published?
->>>>>>> 6b044ab369192711400af98fe1e26721ad3ca900
 
->>>>>>> a85fb5bd1972aba57b69cdcfd0d93b2bd094bc71
     ## ruby html
     return true unless Zomeki.config.application['cms.use_kana']
     uri = params[:uri]
