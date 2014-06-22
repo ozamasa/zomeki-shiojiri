@@ -24,7 +24,7 @@ class CustomField::Admin::ImportController < Cms::Controller::Admin::Base
     csv = NKF.nkf('-w', params[:item][:file].read)
 
     ActiveRecord::Base.transaction do
-      CSV.parse(csv, headers: true, header_converters: :symbol) do |data|
+      CSV.parse(csv, headers: true) do |data| # , header_converters: :symbol
 
         no         = data[0]
         title      = data[1]

@@ -250,6 +250,15 @@ class GpArticle::Content::Doc < Cms::Content
     site.public_path
   end
 
+  def custom_field_available?
+    !setting_value(:custom_field_id).blank?
+  end
+
+  def custom_field_content
+    return nil unless custom_field_available?
+    CustomField::Content::Doc.find_by_id(setting_value(:custom_field_id))
+  end
+
   private
 
   def set_default_settings

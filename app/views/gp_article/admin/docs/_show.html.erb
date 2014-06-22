@@ -96,6 +96,18 @@
     </table>
     <%- end -%>
 
+    <%- if @content.custom_field_available? -%>
+    <p class="form"><%= @content.custom_field_content.name %></p>
+      <table class="show">
+      <%- @content.custom_field_content.forms.each do |custom_field_form| -%>
+        <tr>
+          <th><%= custom_field_form.title -%></th>
+          <td><%= custom_field_form.value(@content.setting_value(:custom_field_id), @item.id) -%></td>
+        </tr>
+      <%- end -%>
+      </table>
+    <%- end -%>
+
     <p class="form">記事設定</p>
 
     <table class="show">

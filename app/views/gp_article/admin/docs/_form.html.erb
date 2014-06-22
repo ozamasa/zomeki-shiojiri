@@ -81,6 +81,25 @@
       <%= render partial: 'gp_template/admin/shared/form', locals: {template: @item.template, template_values: @item.template_values} if @item.template %>
     </div>
 
+    <%- if @content.custom_field_available? -%>
+    <p class="form"><%= @content.custom_field_content.name %></p>
+      <table class="show">
+      <%- @content.custom_field_content.forms.each do |custom_field_form| -%>
+        <tr>
+          <th><%= custom_field_form.title -%></th>
+          <td><%= custom_field_form.value(@content.setting_value(:custom_field_id), @item.id) -%></td>
+          <td>
+              <% if custom_field_form.input_method == "text_area" -%>
+              <%= text_area_tag custom_field_form.name, custom_field_form.value(@content.setting_value(:custom_field_id), @item.id) -%>
+              <% else %>
+              <%= text_field_tag custom_field_form.name, custom_field_form.value(@content.setting_value(:custom_field_id), @item.id) -%>
+              <% end %>
+          </td>
+        </tr>
+      <%- end -%>
+      </table>
+    <%- end -%>
+
     <%- if @content.blog_functions_available? -%>
     <p class="form">追記を入力する</p>
 

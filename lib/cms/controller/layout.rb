@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Cms::Controller::Layout
   @no_cache    = nil
-  
+
   def render_public_as_string(path, options = {})
     Core.publish = true unless options[:preview]
     mode = Core.set_mode('preview')
@@ -44,7 +44,7 @@ module Cms::Controller::Layout
 
     return error ? nil : body
   end
-  
+
   def render_public_layout
     if Rails.env.to_s == 'production' && !@no_cache
       # enable cache
@@ -54,20 +54,20 @@ module Cms::Controller::Layout
       #response.headers["Pragma"] = "no-cache"
       #response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
     end
-    
+
     Page.current_item = Page.current_node unless Page.current_item
-    
+
     return true if @performed_redirect
     return true if params[:format] && params[:format] != 'html'
     return true if Page.error
-    
+
     ## content
     Page.content = response.body
     self.response_body = nil
-    
+
     ## concept
     concepts = Cms::Lib::Layout.inhertited_concepts
-    
+
     ## layout
     if Core.set_mode('preview') && params[:layout_id]
       Page.layout = Cms::Layout.find(params[:layout_id])
@@ -88,14 +88,14 @@ module Cms::Controller::Layout
     end
 
     body = Page.layout.body_tag(request).clone.to_s
-    
+
     ## render the piece
     Cms::Lib::Layout.find_design_pieces(body, concepts).each do |name, item|
       Page.current_piece = item
       begin
         next if item.content_id && !item.content
         mnames= item.model.underscore.pluralize.split('/')
-        
+
         data = render_component_into_view :params => params,
           :controller => mnames[0] + '/public/piece/' + mnames[1], :action => 'index'
         if data =~ /^<html/ && Rails.env.to_s == 'production'
@@ -107,16 +107,31 @@ module Cms::Controller::Layout
         error_log(e.message)
       end
     end
-    
+
     ## render the content
     body.gsub!("[[content]]", Page.content)
-    
+
+    body.gsub!("[[title]]",         Page.current_item.title) rescue nil
+    body.gsub!("[[body]]",          Page.current_item.body) rescue nil
+    body.gsub!("[[created_at]]",    Page.current_item.created_at.strftime(Page.current_item.content.setting_value(:date_style))) rescue nil
+    body.gsub!("[[published_at]]",  Page.current_item.published_at.strftime(Page.current_item.content.setting_value(:date_style))) rescue nil
+
+    begin
+      category = ''
+      Page.current_item.categories.public.each do |category|
+        category_type = category.category_type
+        category = ActionController::Base.helpers.link_to(category_type.title, "#{Page.current_item.public_uri}#{category_type.name}/")
+      end
+      body.gsub!("[[category]]",      category) rescue nil
+    rescue
+    end
+
     ## render the data/text
     Cms::Lib::Layout.find_data_texts(body, concepts).each do |name, item|
       data = item.body
       body.gsub!("[[text/#{name}]]", data)
     end
-    
+
     ## render the data/file
     Cms::Lib::Layout.find_data_files(body, concepts).each do |name, item|
       data = ''
@@ -127,7 +142,7 @@ module Cms::Controller::Layout
       end
       body.gsub!("[[file/#{name}]]", data)
     end
-    
+
     ## render the emoji
     require 'jpmobile' #v0.0.4
     body.gsub!(/\[\[emoji\/([0-9a-zA-Z\._-]+)\]\]/) do |m|
@@ -137,7 +152,7 @@ module Cms::Controller::Layout
 
     ## removes the unknown components
     body.gsub!(/\[\[[a-z]+\/[^\]]+\]\]/, '') #if Core.mode.to_s != 'preview'
-    
+
     ## mobile
     if request.mobile?
       begin
@@ -149,7 +164,7 @@ module Cms::Controller::Layout
       rescue => e #InvalidStyleException
         error_log(e.message)
       end
-      
+
       case request.mobile
       when Jpmobile::Mobile::Docomo
         # for docomo
@@ -164,12 +179,12 @@ module Cms::Controller::Layout
         # for PC
       end
     end
-    
+
     ## ruby(kana)
     if Page.ruby
       body = Cms::Lib::Navi::Kana.convert(body, Page.site.id)
     end
-    
+
 #    ## for preview
 #    if Core.mode.to_s == 'preview'
 #      body.gsub!(/<a .*?href="\/[^_].*?>/i) do |m|
@@ -177,23 +192,23 @@ module Cms::Controller::Layout
 #        m.gsub(/(<a .*?href=")(\/[^_].*?>)/i, '\1' + prefix + '\2')
 #      end
 #    end
-    
+
     body = last_convert_body(body)
-    
+
     ## render the true layout
     render :text => (body ? body.force_encoding('UTF-8') : ''), :layout => 'layouts/public/base'
   end
-  
+
   def last_convert_body(body)
     body
   end
-  
+
   def piece_container_html(piece, body)
     return "" if body.blank?
-    
+
     title = piece.view_title
     return body if piece.model == 'Cms::Free' && title.blank?
-    
+
     html  = %Q(<div#{piece.css_attributes}>\n)
     html += %Q(<div class="pieceContainer">\n)
     html += %Q(<div class="pieceHeader"><h2>#{title}</h2></div>\n) if !title.blank?

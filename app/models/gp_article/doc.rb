@@ -674,6 +674,13 @@ class GpArticle::Doc < ActiveRecord::Base
     "#{::File.dirname(public_path)}/file_contents"
   end
 
+  def custom_fields
+    fields = {}
+    content.custom_field_content.forms do ||
+      fields[custom_field_content.forms.name, "aa"]
+    end
+  end
+
   private
 
   def name_validity

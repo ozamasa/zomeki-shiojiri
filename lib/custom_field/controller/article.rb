@@ -6,6 +6,8 @@ module CustomField::Controller::Article
     @item = @content.docs.find(id)
     body = @content.setting_value(:doc_style)
 
+    body = @item.title if @body.blank?
+
     @fields.each do |field|
       pattern = "@#{field.name}@"
       value   = @item.fields.find_by_content_id_and_custom_field_form_id(@content.id, field.id).value.to_s

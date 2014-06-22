@@ -9,10 +9,14 @@ class CustomField::Form < ActiveRecord::Base
   validates_presence_of :content_id, :name, :title
   validates_uniqueness_of :name, scope: :content_id
 
-  has_one :field, foreign_key: :custom_field_form_id,  class_name: 'CustomField::DocField', dependent: :destroy
+  has_many :field, foreign_key: :custom_field_form_id,  class_name: 'CustomField::DocField' #, dependent: :destroy
 
   STYLE_OPTIONS = [['必須','require'],['必須でない','option']]
   METHOD_OPTIONS = [['テキストフィールド','text'],['テキストエリア','text_area'],['プルダウン','select'],['ラジオボタン','radio_buttons'],['チェックボックス','check_boxs']]
+
+  def value(content_id, doc_id)
+    docfield = CustomField::DocField.find_by_content_id_and_custom_field_doc_id_and_custom_field_form_id(content_id, doc_id, id).value rescue nil
+  end
 
   def editable?
     true
