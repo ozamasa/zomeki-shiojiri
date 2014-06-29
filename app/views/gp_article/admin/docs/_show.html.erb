@@ -102,7 +102,7 @@
       <%- @content.custom_field_content.forms.each do |custom_field_form| -%>
         <tr>
           <th><%= custom_field_form.title -%></th>
-          <td><%= custom_field_form.value(@content.setting_value(:custom_field_id), @item.id) -%></td>
+          <td><%= simple_format @item.try(custom_field_form.name) -%></td>
         </tr>
       <%- end -%>
       </table>
