@@ -876,10 +876,12 @@ class GpArticle::Doc < ActiveRecord::Base
 
   after_initialize :define_methods
   def define_methods
-    content.custom_field_content.forms.each do |form|
-      GpArticle::Doc.class_eval do
-        define_method form.name do
-          custom_field_doc_field(form.id).first.value rescue nil
+    if content.custom_field_content
+      content.custom_field_content.forms.each do |form|
+        GpArticle::Doc.class_eval do
+          define_method form.name do
+            custom_field_doc_field(form.id).first.value rescue nil
+          end
         end
       end
     end
