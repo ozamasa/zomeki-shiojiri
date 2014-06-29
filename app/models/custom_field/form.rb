@@ -9,14 +9,11 @@ class CustomField::Form < ActiveRecord::Base
   validates_presence_of :content_id, :name, :title
   validates_uniqueness_of :name, scope: :content_id
 
-  has_many :field, foreign_key: :custom_field_form_id,  class_name: 'CustomField::DocField' #, dependent: :destroy
+  has_many :fields, foreign_key: :custom_field_form_id, class_name: 'CustomField::DocField' #, dependent: :destroy
+  has_many :docs,   foreign_key: :custom_field_doc_id,  class_name: 'CustomField::Doc', through: :fields
 
   STYLE_OPTIONS = [['必須','require'],['必須でない','option']]
   METHOD_OPTIONS = [['テキストフィールド','text'],['テキストエリア','text_area'],['プルダウン','select'],['ラジオボタン','radio_buttons'],['チェックボックス','check_boxs']]
-
-  def value(content_id, doc_id)
-    docfield = CustomField::DocField.find_by_content_id_and_custom_field_doc_id_and_custom_field_form_id(content_id, doc_id, id).value rescue nil
-  end
 
   def editable?
     true
@@ -36,5 +33,13 @@ class CustomField::Form < ActiveRecord::Base
 
   def show_input_method
     METHOD_OPTIONS.detect{|to| to.last == self.input_method }.try(:first)
+  end
+
+  def input_option_array
+    options = []
+    input_option.each_line do |option|
+      options << [option.chomp, option.chomp]
+    end
+    options
   end
 end

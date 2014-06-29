@@ -441,6 +441,20 @@ class GpArticle::Doc < ActiveRecord::Base
 
     new_doc.sns_accounts = self.sns_accounts
 
+    begin
+      new_cdoc = custom_field_doc.dup
+      new_cdoc.gp_article_doc_id = new_doc.id
+      new_cdoc.save
+
+      fields = CustomField::DocField.where(content_id: custom_field_id, custom_field_doc_id: self.id)
+      fields.each do |field|
+        new_cdocfield = field.dup
+        new_cdocfield.custom_field_doc_id = new_doc.id
+        new_cdocfield.save
+      end
+    rescue
+    end
+
     return new_doc
   end
 
@@ -674,11 +688,20 @@ class GpArticle::Doc < ActiveRecord::Base
     "#{::File.dirname(public_path)}/file_contents"
   end
 
-  def custom_fields
-    fields = {}
-    content.custom_field_content.forms do ||
-      fields[custom_field_content.forms.name, "aa"]
-    end
+  def custom_field_id
+    content.setting_value(:custom_field_id)
+  end
+
+  def custom_field_doc
+    CustomField::Doc.find_by_gp_article_doc_id(self.id)
+  end
+
+  def custom_field_doc_fields
+    CustomField::DocField.where(content_id: custom_field_id, custom_field_doc_id: self.id)
+  end
+
+  def custom_field_doc_field(custom_field_form_id)
+    custom_field_doc_fields.where(custom_field_form_id: custom_field_form_id)
   end
 
   private
@@ -849,5 +872,16 @@ class GpArticle::Doc < ActiveRecord::Base
   def keep_edition_relation
     next_edition.update_column(:prev_edition_id, prev_edition_id) if next_edition
     return true
+  end
+
+  after_initialize :define_methods
+  def define_methods
+    content.custom_field_content.forms.each do |form|
+      GpArticle::Doc.class_eval do
+        define_method form.name do
+          custom_field_doc_field(form.id).first.value rescue nil
+        end
+      end
+    end
   end
 end
