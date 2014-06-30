@@ -30,7 +30,7 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
       @docs = @docs.reject{|d| d.will_be_replaced? } unless Core.publish
       @docs = @docs.paginate(page: params[:page], per_page: @content.feed_docs_number)
       respond_to do |format|
-        format.json {return render json: @docs}
+#        format.json {return render json: @docs}
         format.any  {return render_feed(@docs)}
       end
     end
