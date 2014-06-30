@@ -117,6 +117,13 @@ module Cms::Controller::Layout
     body.gsub!("[[published_at]]",  Page.current_item.published_at.strftime(Page.current_item.content.setting_value(:date_style))) rescue nil
 
     begin
+      Page.current_item.content.custom_field_content.forms.each do |custom_field_form|
+        body.gsub!("[[#{custom_field_form.name}]]", "#{Page.current_item.try(custom_field_form.name)}")
+      end
+    rescue
+    end
+
+    begin
       category = ''
       Page.current_item.categories.public.each do |category|
         category_type = category.category_type
