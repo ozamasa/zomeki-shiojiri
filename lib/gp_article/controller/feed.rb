@@ -36,8 +36,10 @@ module GpArticle::Controller::Feed
       hash[:link]         = doc.public_full_uri
       hash[:description]  = strimwidth(doc.body, 500)
       hash[:pubDate]      = doc.display_published_at.rfc822
-      doc.content.custom_field_content.forms.each do |custom_field_form|
-        hash[custom_field_form.title] = @item.try(custom_field_form.name).to_s
+      if doc.content.custom_field_content
+        doc.content.custom_field_content.forms.each do |custom_field_form|
+          hash[custom_field_form.title] = @item.try(custom_field_form.name).to_s
+        end
       end
       doc.categories.each do |category|
         hash[:category]   = category.title
