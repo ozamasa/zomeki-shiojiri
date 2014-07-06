@@ -6,8 +6,17 @@
     <th><%= @item.locale(:version) %></th>
     <td><%= @item.version %></td>
   </tr><tr>
-    <th>転送日時</th>
-    <td colspan="3"><%= safe{@item.created_at.strftime("%Y-%m-%d %H:%M:%S")} %></td>
+    <th><%= @item.locale(:created_at) %></th>
+    <td><%= safe{@item.created_at.strftime("%Y-%m-%d %H:%M:%S")} %></td>
+  </tr><tr>
+    <th><%= @item.locale(:user_name) %></th>
+    <td><%= safe{@item.user.name} %></td>
+  </tr><tr>
+    <th><%= @item.locale(:operated_at) %></th>
+    <td><%= safe{@item.operated_at.strftime("%Y-%m-%d %H:%M:%S")} %></td>
+  </tr><tr>
+    <th><%= @item.locale(:operator_name) %></th>
+    <td><%= @item.operator_name %></td>
   </tr><tr>
     <th><%= @item.locale(:operation) %></th>
     <td><%= @item.operation_label %></td>
@@ -21,9 +30,10 @@
     <th><%= @item.locale(:path) %></th>
     <td><%= @item.path %></td>
   </tr><tr>
+    <th><%= @item.locale(:item) %></th>
+    <td><%= @item.item_id %>：<%= @item.item_name %></td>
+  </tr><tr>
     <th><%= @item.locale(:destination) %></th>
     <td><%= @item.destination %></td>
   </tr>
 </table>
-
-<br />
