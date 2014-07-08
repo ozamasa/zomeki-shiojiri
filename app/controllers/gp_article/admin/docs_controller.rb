@@ -140,9 +140,9 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
       set_approval_requests
       @item.send_approval_request_mail if @item.state_approvable?
 
-      publish_by_update(@item) if @item.state_public?
-
       @item.fix_tmp_files(params[:_tmp])
+
+      publish_by_update(@item) if @item.state_public?
 
       share_to_sns if @item.state_public?
 
