@@ -118,6 +118,19 @@ module Cms::Controller::Layout
 
     begin
       Page.current_item.content.custom_field_content.forms.each do |custom_field_form|
+        cf_st = "[[#{custom_field_form.name}=>]]"
+        cf_ed = "[[<=#{custom_field_form.name}]]"
+        id_st = body.index(cf_st) || 0
+        id_ed = body.index(cf_ed) || 0
+
+        if id_st > 0 && id_ed > 0
+          if Page.current_item.try(custom_field_form.name).blank?
+            body[id_st..(id_ed + cf_ed.length + 1)] = '' rescue nil
+          end
+        end
+
+        body.gsub!("#{cf_st}", '')
+        body.gsub!("#{cf_ed}", '')
         body.gsub!("[[#{custom_field_form.name}]]", "#{Page.current_item.try(custom_field_form.name)}")
       end
     rescue
@@ -125,11 +138,12 @@ module Cms::Controller::Layout
 
     begin
       category = ''
-      Page.current_item.categories.public.each do |category|
-        category_type = category.category_type
-        category = ActionController::Base.helpers.link_to(category_type.title, "#{Page.current_item.public_uri}#{category_type.name}/")
+      Page.current_item.categories.each do |c|
+        category += "<span class='category-#{c.name}'>"
+        category += ActionController::Base.helpers.link_to("#{c.category_type.try(:title)}/#{c.ancestors.map(&:title).join('/')}", c.public_full_uri)
+        category += "</span>\n"
       end
-      body.gsub!("[[category]]",      category) rescue nil
+      body.gsub!("[[category]]", category) rescue nil
     rescue
     end
 
