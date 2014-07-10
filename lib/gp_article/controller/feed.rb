@@ -32,18 +32,52 @@ module GpArticle::Controller::Feed
     docs.each do |doc|
       next unless doc.display_published_at
       hash = {}
+      hash[:id]           = doc.id
       hash[:title]        = doc.title
       hash[:link]         = doc.public_full_uri
       hash[:description]  = strimwidth(doc.body, 500)
       hash[:pubDate]      = doc.display_published_at.rfc822
       if doc.content.custom_field_content
         doc.content.custom_field_content.forms.each do |custom_field_form|
-          hash[custom_field_form.title] = @item.try(custom_field_form.name).to_s
+          hash[custom_field_form.name] = @item.try(custom_field_form.name).to_s
         end
       end
-      doc.categories.each do |category|
-        hash[:category]   = category.title
+
+      hashma = []
+      doc.maps.each do |map|
+        map.markers.each do |m|
+          hashm = {}
+          hashm[:id]   = m.id
+          hashm[:name] = m.name
+          hashm[:lat]  = m.lat
+          hashm[:lng]  = m.lng
+          hashma << hashm
+        end
       end
+      hash[:map] = hashma
+
+      hashmd = []
+      doc.rel_docs.each do |d|
+        hashd = {}
+        hashd[:id]    = d.id
+        hashd[:title] = d.title
+        hashd[:link]  = d.public_full_uri
+        hashmd << hashd
+      end
+      hash[:rel] = hashmd
+
+      hashmc = []
+      doc.categories.each do |c|
+        hashc = {}
+        hashc[:id]     = c.id
+        hashc[:term]   = c.name
+        hashc[:title]  = c.title
+        hashc[:scheme] = c.public_full_uri
+        hashc[:label]  = "カテゴリ/#{c.category_type.try(:title)}/#{c.ancestors.map(&:title).join('/')}"
+        hashmc << hashc
+      end
+      hash[:category] = hashmc
+
       item << hash
     end
     item
