@@ -126,6 +126,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
 
     validate_approval_requests if @item.state_approvable?
+    validate_custom_fields
     return render(failed_template) unless @item.errors.empty?
 
     location = ->(d){ edit_gp_article_doc_url(@content, d) } if @item.state_draft?
@@ -190,6 +191,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
 
     validate_approval_requests if @item.state_approvable?
+    validate_custom_fields
     return render(failed_template) unless @item.errors.empty?
 
     location = url_for(action: 'edit') if @item.state_draft?
@@ -359,11 +361,25 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
   end
 
   def update_custom_fields
+    @item.custom_field_doc_fields.each do |field|
+      if field && field.form
+        field.destroy if field.form.input_method == 'check_boxs'
+      end
+    end
+
     params[:custom_field].each do |p|
       field = @item.custom_field_doc_field(p.first).first_or_create
       value = p.last
       value = value.keys.join("\n") if value.is_a?(Hash)
       field.update_attribute(:value, value)
+    end
+  end
+
+  def validate_custom_fields
+    @item.custom_field_forms.each do |form|
+      if form.style == 'require' && params[:custom_field][form.id.to_s].blank?
+        @item.errors.add(:base, "#{form.title}を入力してください。")
+      end
     end
   end
 

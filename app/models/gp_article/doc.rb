@@ -710,6 +710,10 @@ class GpArticle::Doc < ActiveRecord::Base
     custom_field_doc_fields.where(custom_field_form_id: custom_field_form_id)
   end
 
+  def custom_field_forms
+    CustomField::Form.where(content_id: custom_field_id)
+  end
+
   private
 
   def name_validity

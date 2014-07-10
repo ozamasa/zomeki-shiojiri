@@ -86,25 +86,28 @@
       <table class="show">
       <%- @content.custom_field_content.forms.each do |custom_field_form| -%>
         <tr>
-          <th><%= custom_field_form.title -%></th>
+          <th><%= custom_field_form.title -%> <% if custom_field_form.style == 'require' %><span class="note">※</span><% end %></th>
           <td>
+              <% value = @item.try(custom_field_form.name) %>
+              <% value = params[:custom_field][custom_field_form.id.to_s] rescue nil if params[:custom_field] %>
               <% case custom_field_form.input_method -%>
               <% when 'text_area' %>
-              <%= text_area_tag "custom_field[#{custom_field_form.id}]", @item.try(custom_field_form.name), rows: '5', style: 'width:100%' -%>
+              <%= text_area_tag "custom_field[#{custom_field_form.id}]", value, rows: '5', style: 'width:100%' -%>
               <% when 'select' %>
-              <%= select_tag "custom_field[#{custom_field_form.id}]", options_for_select(custom_field_form.input_option_array, @item.try(custom_field_form.name)), include_blank: true -%>
+              <%= select_tag "custom_field[#{custom_field_form.id}]", options_for_select(custom_field_form.input_option_array, value), include_blank: true -%>
               <% when 'radio_buttons' %>
               <% custom_field_form.input_option_array.each do |array| %>
-              <%= radio_button_tag "custom_field[#{custom_field_form.id}]", array.first, (array.first == @item.try(custom_field_form.name)) -%>
+              <%= radio_button_tag "custom_field[#{custom_field_form.id}]", array.first, (array.first == value) -%>
               <%= array.first %>
               <% end %>
               <% when 'check_boxs' %>
+              <% value = value.to_s.split(/\r?\n/) rescue value = value.values %>
               <% custom_field_form.input_option_array.each do |array| %>
-              <%= check_box_tag "custom_field[#{custom_field_form.id}][#{array.first}]", array.first, @item.try(custom_field_form.name).to_s.split(/\r?\n/).include?(array.first) -%>
+              <%= check_box_tag "custom_field[#{custom_field_form.id}][#{array.first}]", array.first, value.to_s.include?(array.first) -%>
               <%= array.first %>
               <% end %>
               <% else %>
-              <%= text_field_tag "custom_field[#{custom_field_form.id}]", @item.try(custom_field_form.name), style: 'width:100%' -%>
+              <%= text_field_tag "custom_field[#{custom_field_form.id}]", value, style: 'width:100%' -%>
               <% end %>
           </td>
         </tr>
