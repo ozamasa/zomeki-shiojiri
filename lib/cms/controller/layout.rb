@@ -140,10 +140,30 @@ module Cms::Controller::Layout
       category = ''
       Page.current_item.categories.each do |c|
         category += "<span class='category-#{c.name}'>"
-        category += ActionController::Base.helpers.link_to("#{c.category_type.try(:title)}/#{c.ancestors.map(&:title).join('/')}", c.public_full_uri)
+        category += ActionController::Base.helpers.link_to("#{c.category_type.try(:title)}/#{c.ancestors.map(&:title).join('/')}", c.public_uri)
         category += "</span>\n"
       end
       body.gsub!("[[category]]", category) rescue nil
+    rescue
+    end
+
+    begin
+      view = ActionView::Base.new(Rails.configuration.paths['app/views'])
+      maps = view.render(partial: 'cms/public/_partial/maps/view', locals: {item: Page.current_item})
+      body.gsub!("[[map]]", maps) rescue nil
+    rescue
+    end
+
+    begin
+      rel_docs = ''
+      Page.current_item.rel_docs.each do |d|
+        rel_docs += "<li><span class='title'>"
+        rel_docs += ActionController::Base.helpers.link_to(d.title, d.public_uri)
+        rel_docs += "</span></li>\n"
+      end
+      rel_doc_tag = ''
+      rel_doc_tag = "\n<div class='rels'>\n<h2>関連記事</h2>\n<ul>\n#{rel_docs}</ul>\n</div>\n" unless rel_docs.blank?
+      body.gsub!("[[rel_doc]]", rel_doc_tag) rescue nil
     rescue
     end
 
