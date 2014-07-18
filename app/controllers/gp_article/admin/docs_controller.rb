@@ -15,6 +15,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     @visible_category_types = @content.visible_category_types
     @event_category_types = @content.event_category_types
     @marker_category_types = @content.marker_category_types
+    @portal_group = @content.portal_group
 
     @item = @content.docs.find(params[:id]) if params[:id].present?
 
@@ -125,6 +126,9 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     @item.concept = @content.concept
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
 
+    @item.portal_group_id    = @portal_group.id
+    @item.portal_group_state = @content.site.portal_group_state
+
     validate_approval_requests if @item.state_approvable?
     validate_custom_fields
     return render(failed_template) unless @item.errors.empty?
@@ -189,6 +193,8 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     end
 
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
+
+    @item.portal_group_id ||= @portal_group.id
 
     validate_approval_requests if @item.state_approvable?
     validate_custom_fields
@@ -367,11 +373,13 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
       end
     end
 
-    params[:custom_field].each do |p|
-      field = @item.custom_field_doc_field(p.first).first_or_create
-      value = p.last
-      value = value.keys.join("\n") if value.is_a?(Hash)
-      field.update_attribute(:value, value)
+    if params[:custom_field]
+      params[:custom_field].each do |p|
+        field = @item.custom_field_doc_field(p.first).first_or_create
+        value = p.last
+        value = value.keys.join("\n") if value.is_a?(Hash)
+        field.update_attribute(:value, value)
+      end
     end
   end
 

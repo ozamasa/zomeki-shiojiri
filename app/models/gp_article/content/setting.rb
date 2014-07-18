@@ -1,5 +1,7 @@
 # encoding: utf-8
 class GpArticle::Content::Setting < Cms::ContentSetting
+  set_config :portal_group_id, name: 'ポータル記事分類コンテンツ',
+    options: []
   set_config :gp_category_content_category_type_id, name: '汎用カテゴリタイプ',
     options: lambda { GpCategory::Content::CategoryType.where(site_id: Core.site.id).map {|ct| [ct.name, ct.id] } }
   set_config :custom_field_id, name: 'カスタムフィールド',
@@ -92,6 +94,33 @@ class GpArticle::Content::Setting < Cms::ContentSetting
     {
       display_fields: ['group_id', 'address', 'tel', 'fax', 'email', 'note']
     }
+  end
+
+  def config_options
+    case name
+    when 'portal_group_id'
+      item = Cms::Content.new
+      item.and :state, "public"
+      item.and :model, "PortalGroup::Group"
+      items = item.find(:all, :order => "site_id, name")
+      return items.collect{|c| ["#{c.site.name} : #{c.name}", c.id] }
+    end
+    super
+  end
+
+  def value_name
+    if !value.blank?
+      case name
+      when 'portal_group_id'
+        item = Cms::Content.new
+        item.and :id, value
+        item.and :state, "public"
+        item.and :model, "PortalGroup::Group"
+        item = item.find(:first)
+        return item ? "#{item.site.name} : #{item.name}" : nil
+      end
+    end
+    super
   end
 
   private

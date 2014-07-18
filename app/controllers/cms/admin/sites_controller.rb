@@ -92,6 +92,7 @@ class Cms::Admin::SitesController < Cms::Controller::Admin::Base
       query    = {:portal_group_state => "visible"}
       criteria = {:content_id => content.id}
       PortalArticle::Doc.update_all(query, criteria)
+      GpArticle::Doc.update_all(query, criteria)
     end
 
     flash[:notice] = "ポータルに公開しました。"
@@ -107,6 +108,7 @@ class Cms::Admin::SitesController < Cms::Controller::Admin::Base
       query    = {:portal_group_state => "hidden"}
       criteria = {:content_id => content.id}
       PortalArticle::Doc.update_all(query, criteria)
+      GpArticle::Doc.update_all(query, criteria)
     end
 
     flash[:notice] = "ポータル公開を終了しました。"

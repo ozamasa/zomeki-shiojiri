@@ -714,6 +714,10 @@ class GpArticle::Doc < ActiveRecord::Base
     CustomField::Form.where(content_id: custom_field_id)
   end
 
+  def agent_filter(agent)
+    self
+  end
+
   private
 
   def name_validity
@@ -887,7 +891,7 @@ class GpArticle::Doc < ActiveRecord::Base
 
   after_initialize :define_methods
   def define_methods
-    if content.custom_field_content
+    if content && content.custom_field_content
       content.custom_field_content.forms.each do |form|
         GpArticle::Doc.class_eval do
           define_method form.name do

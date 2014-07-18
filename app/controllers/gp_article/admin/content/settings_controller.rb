@@ -83,6 +83,11 @@ class GpArticle::Admin::Content::SettingsController < Cms::Controller::Admin::Ba
       if @item.name == 'map_relation' && @content.map_content_marker.nil?
         @content.docs.where(marker_state: 'visible').update_all(marker_state: 'hidden')
       end
+      if @item.name == 'portal_group_id'
+        values = {:portal_group_id => @item.value}
+        cond   = {:content_id => @item.content_id}
+        GpArticle::Doc.update_all(values, cond)
+      end
     end
   end
 end

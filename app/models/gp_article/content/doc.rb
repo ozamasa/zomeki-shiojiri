@@ -259,6 +259,12 @@ class GpArticle::Content::Doc < Cms::Content
     CustomField::Content::Doc.find_by_id(setting_value(:custom_field_id))
   end
 
+  def portal_group
+    group_id = setting_value(:portal_group_id)
+    return nil if group_id.blank?
+    PortalGroup::Content::Group.find_by_id(group_id)
+  end
+
   private
 
   def set_default_settings

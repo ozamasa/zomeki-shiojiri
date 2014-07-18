@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140707061405) do
+ActiveRecord::Schema.define(:version => 20140717140011) do
 
   create_table "ad_banner_banners", :force => true do |t|
     t.string   "name"
@@ -794,6 +794,8 @@ ActiveRecord::Schema.define(:version => 20140707061405) do
     t.string   "title_kana"
     t.string   "filename_base"
     t.string   "title_column"
+    t.integer  "portal_group_id"
+    t.string   "portal_group_state"
   end
 
   add_index "gp_article_docs", ["concept_id"], :name => "index_gp_article_docs_on_concept_id"

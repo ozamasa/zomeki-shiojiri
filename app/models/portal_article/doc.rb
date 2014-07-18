@@ -30,11 +30,11 @@ class PortalArticle::Doc < ActiveRecord::Base
   belongs_to :language,       :foreign_key => :language_id,       :class_name => 'Sys::Language'
 
   attr_accessor :link_checker
-  
+
   validates_presence_of :title
   validates_uniqueness_of :name, :scope => :content_id,
     :if => %Q(!replace_page?)
-  
+
   validates_presence_of :state, :language_id,
     :if => %Q(state == "recognize")
   validates_length_of :title,  :maximum => 200,
@@ -51,21 +51,21 @@ class PortalArticle::Doc < ActiveRecord::Base
     :if => %Q(state == "recognize")
   validate :validate_links,
     :if => %Q(link_checker)
-  
+
   before_save :check_digit
   before_save :modify_attributes
-  
+
   def validate_word_dictionary
     dic = content.setting_value(:word_dictionary)
     return if dic.blank?
-    
+
     words = []
     dic.split(/\r\n|\n/).each do |line|
       next if line !~ /,/
       data = line.split(/,/)
       words << [data[0].strip, data[1].strip]
     end
-    
+
     if !body.blank?
       words.each {|src, dst| self.body = body.gsub(src, dst) }
     end
@@ -73,7 +73,7 @@ class PortalArticle::Doc < ActiveRecord::Base
       words.each {|src, dst| self.mobile_body = mobile_body.gsub(src, dst) }
     end
   end
-  
+
   def validate_platform_dependent_characters
     [:title, :body, :mobile_body].each do |attr|
       if chars = Util::String.search_platform_dependent_characters(send(attr))
@@ -81,13 +81,13 @@ class PortalArticle::Doc < ActiveRecord::Base
       end
     end
   end
-  
+
   def validate_links
     unless @link_checker.check_link(body)
       errors.add_to_base "リンクチェックの結果を確認してください。"
     end
   end
-  
+
   def date_and_site
     #separator = %Q(<span class="separator">　</span>)
     separator = %Q( )
@@ -98,7 +98,7 @@ class PortalArticle::Doc < ActiveRecord::Base
     values << %Q(<span class="date">#{published_at.strftime('%Y年%-m月%-d日 %-H時%-M分')}</span>) if published_at
     %Q( <span class="attributes">#{values.join(separator)}</span>).html_safe
   end
-  
+
   def states
     s = [['下書き保存','draft'],['承認待ち','recognize']]
     s << ['公開保存','public'] if Core.user.has_auth?(:manager)
@@ -108,18 +108,18 @@ class PortalArticle::Doc < ActiveRecord::Base
   def event_states
     [['表示','visible'],['非表示','hidden']]
   end
-  
+
   def agent_states
     [['全てに表示',''], ['PCのみ表示','pc'], ['携帯のみ表示','mobile']]
   end
-  
+
   def agent_status
     agent_states.each do |name, id|
       return Sys::Base::Status.new(:id => id, :name => name) if agent_state.to_s == id
     end
     nil
   end
-  
+
   def public_path
     if name =~ /^[0-9]{13}$/
       _name = name.gsub(/^((\d{4})(\d\d)(\d\d)(\d\d)(\d\d).*)$/, '\2/\3/\4/\5/\6/\1')
@@ -132,18 +132,18 @@ class PortalArticle::Doc < ActiveRecord::Base
   def public_uri=(uri)
     @public_uri = uri
   end
-  
+
   def public_uri
     return @public_uri if @public_uri
     return nil unless node = content.doc_node
     @public_uri = "#{node.public_uri}#{name}/"
   end
-  
+
   def public_full_uri
     return nil unless node = content.doc_node
     "#{node.public_full_uri}#{name}/"
   end
-  
+
   def body_without_summary_code
     if self.body =~ /\[\[\/?summary\]\]/
       self.body.to_s.gsub(/\[\[\/?summary\]\]/, '')
@@ -151,7 +151,7 @@ class PortalArticle::Doc < ActiveRecord::Base
       self.body.to_s
     end
   end
-  
+
   def summary
     summary = body.to_s
     if summary =~ /\[\[\/?summary\]\]/
@@ -160,11 +160,11 @@ class PortalArticle::Doc < ActiveRecord::Base
     end
     summary
   end
-  
+
   def mobile_page?
     agent_state == 'mobile'
   end
-  
+
   def agent_filter(agent)
     self.and do |c|
       c.or :agent_state, 'IS', nil
@@ -176,7 +176,7 @@ class PortalArticle::Doc < ActiveRecord::Base
     end
     self
   end
-  
+
   def event_date_is(options = {})
     self.and :language_id, 1
     self.and :event_state, 'visible'
@@ -195,32 +195,32 @@ class PortalArticle::Doc < ActiveRecord::Base
     end
     self
   end
-  
+
   def group_is(group)
     conditions = []
-    
+
     if group.category.size > 0
       doc = self.class.new
       doc.category_is(group.category_items)
       conditions << doc.condition
     end
-    
+
     condition = Condition.new
     if group.condition == 'and'
       conditions.each {|c| condition.and(c) if c.where }
     else
       conditions.each {|c| condition.or(c) if c.where }
     end
-    
+
     self.and condition if condition.where
     self
   end
-  
+
   def modify_attributes
     self.agent_state = nil if agent_state == ''
     return true
   end
-  
+
   def check_digit
     return true if name.to_s != ''
     date = Date.strptime(Core.now, '%Y-%m-%d').strftime('%Y%m%d')
@@ -230,10 +230,10 @@ class PortalArticle::Doc < ActiveRecord::Base
     self.name = Util::String::CheckDigit.check(name)
     return true
   end
-  
+
   def bread_crumbs(doc_node)
     crumbs = []
-    
+
     content = PortalArticle::Content::Doc.find_by_id(content_id)
     if content
       ## portal article / category
@@ -245,7 +245,7 @@ class PortalArticle::Doc < ActiveRecord::Base
         crumbs << c
       end
     end
-    
+
     ## portal group / categories
     if content && content.setting_value(:portal_bread_crumbs) == "visible"
       node  = content.portal_category_node
@@ -255,7 +255,7 @@ class PortalArticle::Doc < ActiveRecord::Base
         c << items.collect{|i| [i.title, "#{node.public_full_uri}#{i.name}/"]}
         crumbs << c
       end
-      
+
       node  = content.portal_business_node
       items = portal_business_items
       if node && items.size > 0
@@ -263,7 +263,7 @@ class PortalArticle::Doc < ActiveRecord::Base
         c << items.collect{|i| [i.title, "#{node.public_full_uri}#{i.name}/"]}
         crumbs << c
       end
-      
+
       node  = content.portal_attribute_node
       items = portal_attribute_items
       if node && items.size > 0
@@ -271,7 +271,7 @@ class PortalArticle::Doc < ActiveRecord::Base
         c << items.collect{|i| [i.title, "#{node.public_full_uri}#{i.name}/"]}
         crumbs << c
       end
-      
+
       node  = content.portal_area_node
       items = portal_area_items
       if node && items.size > 0
@@ -280,7 +280,7 @@ class PortalArticle::Doc < ActiveRecord::Base
         crumbs << c
       end
     end
-    
+
     if crumbs.size == 0
       doc_node.routes.each do |r|
         c = []
@@ -331,14 +331,14 @@ class PortalArticle::Doc < ActiveRecord::Base
     self.state = 'public'
     self.published_at ||= Core.now
     return false unless save(:validate => false)
-    
+
     if rep = replaced_page
       rep.destroy
     end
-    
+
     publish_page(content, :path => public_path, :uri => public_uri)
   end
-  
+
   def close
     @save_mode = :close
     self.state = 'closed' if self.state == 'public'
@@ -347,21 +347,21 @@ class PortalArticle::Doc < ActiveRecord::Base
     close_page
     return true
   end
-  
+
   def close_page(options = {})
     return false unless super
     publishers.destroy_all if publishers.size > 0
     FileUtils.rm_f(::File.dirname(public_path))
     return true
   end
-  
+
   def rebuild(content, options)
     return false unless public?
     @save_mode = :publish
     publish_page(content, options)
     publish_files ## dust remains
   end
-  
+
   def duplicate(rel_type = nil)
     item = self.class.new(self.attributes)
     item.id            = nil
@@ -371,16 +371,16 @@ class PortalArticle::Doc < ActiveRecord::Base
     item.recognized_at = nil
     item.published_at  = nil
     item.state         = 'draft'
-    
+
     if rel_type == nil
       item.name          = nil
       item.title         = item.title.gsub(/^(【複製】)*/, "【複製】")
     end
-    
+
     item.in_recognizer_ids  = recognition.recognizer_ids if recognition
     item.in_editable_groups = editable_group.group_ids.split(' ') if editable_group
     item.in_tags            = tags.collect{|c| c.word} if tags.size > 0
-    
+
     if maps.size > 0
       _maps = {}
       maps.each do |m|
@@ -390,9 +390,9 @@ class PortalArticle::Doc < ActiveRecord::Base
       end
       item.in_maps = _maps
     end
-    
+
     return false unless item.save(:validate => false)
-    
+
     files.each do |f|
       file = Sys::File.new(f.attributes)
       file.file        = Sys::Lib::File::NoUploadedFile.new(f.upload_path)
@@ -400,7 +400,7 @@ class PortalArticle::Doc < ActiveRecord::Base
       file.parent_unid = item.unid
       file.save
     end
-    
+
     if rel_type == :replace
       rel = Sys::UnidRelation.new
       rel.unid     = item.unid
@@ -408,17 +408,21 @@ class PortalArticle::Doc < ActiveRecord::Base
       rel.rel_type = 'replace'
       rel.save
     end
-    
+
     return item
   end
-  
+
   def default_map_position
     v = content.setting_value(:default_map_position)
     v.blank? ? super : v
   end
-  
+
   def inquiry_email_setting
     v = content.setting_value(:inquiry_email_display)
     v.blank? ? super : v
+  end
+
+  def public
+    return GpArticle::Doc.new.public
   end
 end
