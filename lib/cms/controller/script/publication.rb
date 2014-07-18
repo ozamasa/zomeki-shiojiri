@@ -15,8 +15,6 @@ class Cms::Controller::Script::Publication < ApplicationController
   end
 
   def publish_page(item, params = {})
-    return
-
     ::Script.current
 
     if ::Script.options

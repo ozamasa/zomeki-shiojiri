@@ -126,7 +126,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     @item.concept = @content.concept
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
 
-    @item.portal_group_id    = @portal_group.id
+    @item.portal_group_id    = @portal_group.id rescue nil
     @item.portal_group_state = @content.site.portal_group_state
 
     validate_approval_requests if @item.state_approvable?
@@ -194,7 +194,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
 
     @item.state = new_state if new_state.present? && @item.class::STATE_OPTIONS.any?{|v| v.last == new_state }
 
-    @item.portal_group_id ||= @portal_group.id
+    @item.portal_group_id ||= @portal_group.id rescue nil
 
     validate_approval_requests if @item.state_approvable?
     validate_custom_fields
@@ -235,7 +235,9 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     uri = item.public_uri
     uri = (uri =~ /\?/) ? uri.gsub(/\?/, 'index.html.r?') : "#{uri}index.html.r"
     path = "#{item.public_path}.r"
-    item.publish_page(render_public_as_string(uri, :site => item.content.site), :path => path, :dependent => :ruby)
+    if Zomeki.config.application['sys.publish_page'] || true
+      item.publish_page(render_public_as_string(uri, :site => item.content.site), :path => path, :dependent => :ruby)
+    end
   end
 
   def publish

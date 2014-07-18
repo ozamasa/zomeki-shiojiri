@@ -16,6 +16,9 @@ sys:
   transfer_opt_include: "config/rsync/public_include.lst"
   transfer_opt_remote_shell: "ssh -p 22"
 
+  # 静的ページ書き出し
+  publish_page: true
+
 cms:
   #ページ数付きページ書き出し数
   publish_more_pages: 0
