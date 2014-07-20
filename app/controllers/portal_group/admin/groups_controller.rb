@@ -1,15 +1,16 @@
 # encoding: utf-8
 class PortalGroup::Admin::GroupsController < Cms::Controller::Admin::Base
-  
+
   def index
-    redirect_to portal_group_categories_path(params[:content], 0)
+#    redirect_to portal_group_categories_path(params[:content], 0)
+    redirect_to portal_group_content_settings_path
   end
-  
+
   def categories
     roots = PortalGroup::Category.root_items(:content_id => params[:item_portal_group_id])
     @options = make_candidates(roots, :label => :title)
     @options = [["// 一覧を更新しました（#{@options.size}件）",'']] + @options
-    
+
     render :action => :options, :layout => false
   end
 
@@ -17,7 +18,7 @@ class PortalGroup::Admin::GroupsController < Cms::Controller::Admin::Base
     roots = PortalGroup::Business.root_items(:content_id => params[:item_portal_group_id])
     @options = make_candidates(roots, :label => :title)
     @options = [["// 一覧を更新しました（#{@options.size}件）",'']] + @options
-    
+
     render :action => :options, :layout => false
   end
 
@@ -26,15 +27,15 @@ class PortalGroup::Admin::GroupsController < Cms::Controller::Admin::Base
     items = PortalGroup::Attribute.find(:all, :conditions => cond, :order => "content_id, sort_no")
     @options = items.collect{|c| [c.title, c.id]}
     @options = [["// 一覧を更新しました（#{@options.size}件）",'']] + @options
-    
+
     render :action => :options, :layout => false
   end
-  
+
   def areas
     roots = PortalGroup::Area.root_items(:content_id => params[:item_portal_group_id])
     @options = make_candidates(roots, :label => :title)
     @options = [["// 一覧を更新しました（#{@options.size}件）",'']] + @options
-    
+
     render :action => :options, :layout => false
   end
 
@@ -44,7 +45,7 @@ protected
     label   = options[:label] || :name
     order   = options[:order] || :sort_no
     cond    = options[:conditions] || {}
-    
+
     choices = []
     roots = roots.to_a
     if roots.size > 0
