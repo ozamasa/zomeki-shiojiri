@@ -78,6 +78,18 @@ module GpArticle::Controller::Feed
       end
       hash[:category] = hashmc
 
+      hashmr = []
+      doc.rel_gpartcle_content_docs.each do |r|
+        hashr = {}
+        hashr[:id]    = r.id
+        hashr[:title] = r.title
+        hashr[:link]  = r.public_full_uri
+        hashr[:description]  = strimwidth(r.body, 500)
+        hashr[:pubDate]      = r.display_published_at.rfc822
+        hashmr << hashr
+      end
+      hash[:recent] = hashmr
+
       item << hash
     end
     item

@@ -17,6 +17,7 @@ class GpArticle::Doc < ActiveRecord::Base
   include Sys::Model::Auth::EditableGroup
 
   include GpArticle::Model::Rel::Doc::Rel
+  include GpArticle::Model::Rel::Doc::Recent
   include GpTemplate::Model::Rel::Template
 
   STATE_OPTIONS = [['下書き保存', 'draft'], ['承認依頼', 'approvable'], ['即時公開', 'public']]
@@ -695,7 +696,7 @@ class GpArticle::Doc < ActiveRecord::Base
   end
 
   def custom_field_id
-    content.setting_value(:custom_field_id)
+    content.setting_value(:custom_field_id).to_s
   end
 
   def custom_field_doc

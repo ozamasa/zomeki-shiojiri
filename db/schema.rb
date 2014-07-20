@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140717140011) do
+ActiveRecord::Schema.define(:version => 20140717205226) do
 
   create_table "ad_banner_banners", :force => true do |t|
     t.string   "name"
@@ -753,7 +753,7 @@ ActiveRecord::Schema.define(:version => 20140717140011) do
     t.integer  "concept_id"
     t.integer  "content_id"
     t.string   "title"
-    t.text     "body",                       :limit => 16777215
+    t.text     "body",                          :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "href"
@@ -796,6 +796,7 @@ ActiveRecord::Schema.define(:version => 20140717140011) do
     t.string   "title_column"
     t.integer  "portal_group_id"
     t.string   "portal_group_state"
+    t.integer  "rel_gp_article_content_doc_id"
   end
 
   add_index "gp_article_docs", ["concept_id"], :name => "index_gp_article_docs_on_concept_id"

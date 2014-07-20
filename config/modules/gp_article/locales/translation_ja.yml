@@ -52,6 +52,7 @@ ja:
         inquiries/email: 連絡先（メールアドレス）
         title_kana: フリガナ
         inquiries/note: 連絡先（備考）
+        rel_gp_article_content_doc_id: 関連汎用記事コンテンツ
       gp_article/category_type:
         name: カテゴリタイプID
         title: カテゴリタイプ名

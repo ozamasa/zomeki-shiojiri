@@ -144,6 +144,10 @@
       <%= select_tag 'rel_doc', '', include_blank: true %><br />
       <%= button_tag '追加', type: 'button', id: 'add_rel_doc' %>
     </div>
+    <div>
+      <div class="label2"><%= f.label :rel_gp_article_content_doc_id %></div>
+      <%= f.select :rel_gp_article_content_doc_id, GpArticle::Content::Doc.order("site_id, id").all.map {|c| [ "#{c.site.name}：#{c.name}", c.id ] }, include_blank: true %>
+    </div>
 
     <hr />
 
