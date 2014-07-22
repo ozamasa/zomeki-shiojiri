@@ -167,6 +167,14 @@ module Cms::Controller::Layout
     rescue
     end
 
+    begin
+      image = ''
+      file = Sys::File.where(parent_unid: Page.current_item.try(:unid)).first
+      image = "<img src='file_contents/#{file.name}' alt='#{file.title}' title='#{file.title}'/>" if file
+      body.gsub!("[[image]]", image)
+    rescue
+    end
+
     ## render the data/text
     Cms::Lib::Layout.find_data_texts(body, concepts).each do |name, item|
       data = item.body
