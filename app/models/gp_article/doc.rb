@@ -444,18 +444,19 @@ class GpArticle::Doc < ActiveRecord::Base
 
     new_doc.sns_accounts = self.sns_accounts
 
-    begin
-      new_cdoc = custom_field_doc.dup
+    new_cdoc = custom_field_doc.try(:dup)
+    if new_cdoc
       new_cdoc.gp_article_doc_id = new_doc.id
       new_cdoc.save
+    end
 
-      fields = CustomField::DocField.where(content_id: custom_field_id, custom_field_doc_id: self.id)
+    fields = CustomField::DocField.where(content_id: custom_field_id, custom_field_doc_id: self.id)
+    if fields
       fields.each do |field|
         new_cdocfield = field.dup
         new_cdocfield.custom_field_doc_id = new_doc.id
         new_cdocfield.save
       end
-    rescue
     end
 
     return new_doc
