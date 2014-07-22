@@ -115,6 +115,14 @@ class GpCategory::Category < ActiveRecord::Base
     docs.order(inherited_docs_order).mobile(::Page.mobile?).public
   end
 
+  def public_docs_descendants
+    docs = []
+    public_descendants.each do |c|
+      docs += c.docs.order(inherited_docs_order).mobile(::Page.mobile?).public
+    end
+    docs
+  end
+
   def copy_from_group(group)
     group.children.each do |child_group|
       if (child = children.where(group_code: child_group.code).first)
