@@ -11,7 +11,7 @@ module DocHelper
                 end
 
 #    image_file = doc.image_files.detect{|f| f.name == doc.list_image } || doc.image_files.first if doc.list_image.present?
-    image_file = doc.files.detect{|f| f.name == doc.list_image } || doc.files.first if doc.list_image.present?
+    image_file = doc.files.detect{|f| f.name == doc.list_image } || doc.files.first # if doc.list_image.present?
 
     doc_image = if image_file
                   image_tag("#{doc.public_uri(without_filename: true)}file_contents/#{url_encode image_file.name}")

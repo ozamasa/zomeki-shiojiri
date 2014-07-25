@@ -43,12 +43,12 @@ class GpArticle::Admin::Docs::FilesController < Cms::Controller::Admin::Base
       item = Sys::File.new(attrs)
       item.tmp_id = @tmp_unid
       item.parent_unid = @doc.try(:unid)
-  
+
       if (duplicated = item.duplicated)
         item = duplicated
         item.attributes = attrs
       end
-  
+
       item.allowed_type = @content.setting_value(:allowed_attachment_type)
       item.image_resize = params[:image_resize]
       if item.creatable? && item.save
@@ -85,7 +85,7 @@ class GpArticle::Admin::Docs::FilesController < Cms::Controller::Admin::Base
       mt = Rack::Mime.mime_type(".#{params[:extname]}")
       type, disposition = (mt =~ %r!^image/|^application/pdf$! ? [mt, 'inline'] : [mt, 'attachment'])
       disposition = 'attachment' if request.env['HTTP_USER_AGENT'] =~ /Android/
-      send_file file.upload_path, :type => type, :filename => file.name, :disposition => disposition
+      send_file file.upload_path, :type => type, :filename => file.name, :disposition => disposition rescue nil
     else
       http_error(404)
     end
