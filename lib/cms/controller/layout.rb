@@ -169,17 +169,8 @@ module Cms::Controller::Layout
 
     begin
       image = ''
-      file = nil
-      case Page.current_item.class.to_s
-      when 'GpArticle::Doc'
-        file = Sys::File.where(parent_unid: Page.current_item.try(:unid)).first
-        image = "<img src='file_contents/#{file.name}' alt='#{file.title}' title='#{file.title}'/>" if file
-      when 'GpCategory::Category'
-        Page.current_item.public_docs_descendants.each do |doc|
-          file = Sys::File.where(parent_unid: doc.try(:unid)).first
-          image = "<img src='#{doc.public_uri}file_contents/#{file.name}' alt='#{file.title}' title='#{file.title}'/>" and break if file
-        end
-      end
+      file  = Sys::File.where(parent_unid: Page.current_item.try(:unid)).first
+      image = "<img src='file_contents/#{file.name}' alt='#{file.title}' title='#{file.title}'/>" if file
       body.gsub!("[[image]]", image)
     rescue
     end
