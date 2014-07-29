@@ -1,4 +1,4 @@
-/var/share/zomeki/log/*.log {
+/home/migoro/zomeki/log/*.log {
   compress
   daily
   dateext

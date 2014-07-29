@@ -1,20 +1,20 @@
 NameVirtualHost *:80
 
-<Directory /var/share/zomeki/sites>
+<Directory /home/migoro/zomeki/sites>
     AllowOverride All
     RewriteEngine on
     PassengerEnabled on
-    PassengerAppRoot /var/share/zomeki
+    PassengerAppRoot /home/migoro/zomeki
     setenv LANG ja_JP.UTF-8
 </Directory>
 
 <VirtualHost *:80>
     ServerName zomeki.example.com
     AddType text/x-component .htc
-    Alias /_common/ "/var/share/zomeki/public/_common/"
-    DocumentRoot /var/share/zomeki/sites/00/00/00/01/00000001/public
-    Include /var/share/zomeki/config/rewrite/base.conf
-    Include /var/share/zomeki/sites/00/00/00/01/00000001/config/rewrite.conf
+    Alias /_common/ "/home/migoro/zomeki/public/_common/"
+    DocumentRoot /home/migoro/zomeki/sites/00/00/00/01/00000001/public
+    Include /home/migoro/zomeki/config/rewrite/base.conf
+    Include /home/migoro/zomeki/sites/00/00/00/01/00000001/config/rewrite.conf
 </VirtualHost>
 
-Include /var/share/zomeki/config/virtual-hosts/sites.conf
+Include /home/migoro/zomeki/config/virtual-hosts/sites.conf
