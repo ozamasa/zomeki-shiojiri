@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'will_paginate/array'
 class GpCategory::Public::Node::CategoriesController < GpCategory::Public::Node::BaseController
   def show
     category_type = @content.category_types.find_by_name(params[:category_type_name])
