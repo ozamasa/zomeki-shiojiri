@@ -8,7 +8,11 @@ module GpArticle::Controller::Feed
       @feed_name   = "#{Page.title} | #{Page.site.name}"
 
       data = eval("to_#{params[:format]}(docs)")
-      return render :xml => unescape(data), :layout => false
+      if params[:format].in?('json')
+        return render text: JSON.generate(data)
+      else
+        return render xml: unescape(data), layout: false
+      end
     end
     return false
   end
@@ -42,6 +46,10 @@ module GpArticle::Controller::Feed
           hash[custom_field_form.name] = @item.try(custom_field_form.name).to_s
         end
       end
+
+      file = Sys::File.where(parent_unid: Page.current_item.try(:unid)).first
+      image = "#{doc.public_full_uri}file_contents/#{file.name}" if file
+      hash[:image] = image || ""
 
       hashma = []
       doc.maps.each do |map|

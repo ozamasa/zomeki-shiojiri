@@ -65,10 +65,8 @@ class GpArticle::Public::Node::DocsController < Cms::Controller::Public::Base
                    @item.mobile_title.presence || @item.title
                  end
 
-    if params[:format].in?('json')
-      respond_to do |format|
-        format.any  {return render_feed([@item])}
-      end
+    respond_to do |format|
+      format.any  {return render_feed([@item])}
     end
 
     if @content.blog_functions[:comment]
