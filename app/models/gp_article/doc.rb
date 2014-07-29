@@ -491,6 +491,8 @@ class GpArticle::Doc < ActiveRecord::Base
   end
 
   def check_links_in_body
+    return []
+
     check_results = check_links(links_in_body)
     @broken_link_exists_in_body = check_results.any? {|r| !r[:result] }
     return check_results

@@ -235,9 +235,7 @@ class GpArticle::Admin::DocsController < Cms::Controller::Admin::Base
     uri = item.public_uri
     uri = (uri =~ /\?/) ? uri.gsub(/\?/, 'index.html.r?') : "#{uri}index.html.r"
     path = "#{item.public_path}.r"
-    if Zomeki.config.application['sys.publish_page'] || true
-      item.publish_page(render_public_as_string(uri, :site => item.content.site), :path => path, :dependent => :ruby)
-    end
+    item.publish_page(render_public_as_string(uri, :site => item.content.site), :path => path, :dependent => :ruby)
   end
 
   def publish

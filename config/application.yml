@@ -6,7 +6,7 @@ sys:
   recognizers_include_admin: false
 
   #自動リンクチェック
-  auto_link_check: true
+  auto_link_check: false
 
   # 書き出しファイル転送設定
   log_closed_page: false
@@ -15,9 +15,6 @@ sys:
   transfer_opt_exclude: "config/rsync/public_exclude.lst"
   transfer_opt_include: "config/rsync/public_include.lst"
   transfer_opt_remote_shell: "ssh -p 22"
-
-  # 静的ページ書き出し
-  publish_page: true
 
 cms:
   #ページ数付きページ書き出し数
