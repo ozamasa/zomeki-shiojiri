@@ -1,14 +1,20 @@
 # encoding: utf-8
 module PortalGroup::Controller::Feed
+  include GpArticle::Controller::Feed
+
   def render_feed(docs)
-    if ['rss', 'atom'].index(params[:format])
+    if ['rss', 'atom', 'json'].index(params[:format])
       @site_uri    = Page.site.full_uri
       @node_uri    = @site_uri.gsub(/\/$/, '') + Page.current_node.public_uri
       @req_uri     = @site_uri.gsub(/\/$/, '') + Page.uri
       @feed_name   = "#{Page.title} | #{Page.site.name}"
 
       data = eval("to_#{params[:format]}(docs)")
-      return render :xml => unescape(data), :layout => false
+      if params[:format].in?('json')
+        return render text: JSON.generate(data)
+      else
+        return render xml: unescape(data), layout: false
+      end
     end
     return false
   end

@@ -724,6 +724,16 @@ class GpArticle::Doc < ActiveRecord::Base
     self
   end
 
+  def date_and_site
+    separator = %Q( )
+    values = []
+    if content && content.site
+      values << %Q(<span class="site">[<a href="#{content.site.full_uri}" target="_blank">#{ERB::Util.html_escape(content.site.name)}</a>]</span>)
+    end
+    values << %Q(<span class="date">#{published_at.strftime('%Y年%-m月%-d日 %-H時%-M分')}</span>) if published_at
+    %Q( <span class="attributes">#{values.join(separator)}</span>).html_safe
+  end
+
   private
 
   def name_validity
