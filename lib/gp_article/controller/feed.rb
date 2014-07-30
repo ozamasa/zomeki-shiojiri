@@ -47,7 +47,9 @@ module GpArticle::Controller::Feed
         end
       end
 
-      file = Sys::File.where(parent_unid: Page.current_item.try(:unid)).first
+      hash[:parent_id] = doc.rel_gp_article_content_doc_id || ''
+
+      file = Sys::File.where(parent_unid: doc.id).first
       image = "#{doc.public_full_uri}file_contents/#{file.name}" if file
       hash[:image] = image || ""
 
