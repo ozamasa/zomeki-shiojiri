@@ -1,5 +1,7 @@
 # encoding: utf-8
 class GpArticle::Content::Setting < Cms::ContentSetting
+  set_config :rel_gp_article_doc_id, name: '関連汎用記事',
+    options: lambda { GpArticle::Doc.public.order("content_id").map {|doc| ["#{doc.content.name} : #{doc.title}", doc.id] } }
   set_config :portal_group_id, name: 'ポータル記事分類コンテンツ',
     options: []
   set_config :gp_category_content_category_type_id, name: '汎用カテゴリタイプ',

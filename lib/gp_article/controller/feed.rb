@@ -48,8 +48,12 @@ module GpArticle::Controller::Feed
         end
       end
 
-      parent_id = GpArticle::Content::Doc.find_by_id(doc.rel_gp_article_content_doc_id).docs.find_first.id rescue nil
-      hash[:parent_id] = parent_id || ''
+      if doc.content.setting_value(:rel_gp_article_doc_id)
+        pdoc = GpArticle::Doc.find(doc.content.setting_value(:rel_gp_article_doc_id))
+        hash[:parent_id]    = pdoc.id
+        hash[:parent_title] = pdoc.title
+        hash[:parent_link]  = pdoc.public_full_uri
+      end
 
       file = Sys::File.where(parent_unid: doc.unid).first
       image = "#{doc.public_full_uri}file_contents/#{file.name}" if file
