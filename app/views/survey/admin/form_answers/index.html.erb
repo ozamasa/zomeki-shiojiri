@@ -2,7 +2,7 @@
   <tr>
     <th style="text-align: center; width: 60px;">詳細</th>
     <th style="text-align: center; width: 120px;"><%= Survey::FormAnswer.human_attribute_name :created_at %></th>
-    <th style="text-align: left; width: 150px;"><%= @items.first.answers.first.question.title if @items.first.answers %><%#= Survey::FormAnswer.human_attribute_name :answered_url %></th>
+    <th style="text-align: left; width: 150px;"><%= @items.first.answers.first.question.title if @items.first && @items.first.answers %><%#= Survey::FormAnswer.human_attribute_name :answered_url %></th>
     <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :remote_addr %></th>
     <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :user_agent %></th>
   </tr>
