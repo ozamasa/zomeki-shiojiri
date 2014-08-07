@@ -74,9 +74,11 @@ class Survey::Public::Node::FormsController < Cms::Controller::Public::Base
   end
 
   def send_mail_and_redirect_to_finish
+    begin
     CommonMailer.survey_receipt(form_answer: @form_answer, from: @content.mail_from, to: @content.mail_to)
                 .deliver if @content.mail_from.present? && @content.mail_to.present?
-
+    rescue
+    end
     redirect_to "#{@node.public_uri}#{@form_answer.form.name}/finish" #?piece=#{params[:piece]}
   end
 
