@@ -47,7 +47,11 @@
         <% end %>
       <%- else -%>
         <div style="margin: 5px; line-height: 1.2;"><%= @item.upper_text %></div>
+        <%- if @item.config[:comment_upper] == 'doc_style_tags' -%>
+        <%= link_to_function '置き換えテキストを確認する', "$('#doc_style_tags').dialog({width: 400});" %>
+        <%- else -%>
         <%= @item.config[:comment_upper] %>
+        <%- end -%>
         <%= value_form(f) %><span style="margin-left: 10px;"><%= @item.config[:comment] %></span>
         <div style="margin: 5px; line-height: 1.2;"><%= @item.lower_text %></div>
       <%- end -%>
@@ -320,6 +324,34 @@ $(document).ready(function () {
       <%= link_to_function '置き換えテキストを確認する', "$('#doc_style_tags').dialog({width: 400});" %>
       <%= text_area_tag :footer_style, @item.extra_values[:footer_style], size: '100x10' %>
     </td>
+  </tr>
+</table>
+<%- end -%>
+
+<%- if @item.name == 'feature_settings' -%>
+<table class="show">
+  <tr>
+    <th><%= GpArticle::Doc.human_attribute_name :feature_1 %></th>
+    <td>
+      <%= radio_button_tag 'feature_1', 'true', @item.extra_values[:feature_1] != 'false' %><%= label_tag 'feature_1_true', '表示' %>
+      <%= radio_button_tag 'feature_1', 'false', @item.extra_values[:feature_1] == 'false' %><%= label_tag 'feature_1_false', '非表示' %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= GpArticle::Doc.human_attribute_name :feature_2 %></th>
+    <td>
+      <%= radio_button_tag 'feature_2', 'true', @item.extra_values[:feature_2] != 'false' %><%= label_tag 'feature_2_true', '表示' %>
+      <%= radio_button_tag 'feature_2', 'false', @item.extra_values[:feature_2] == 'false' %><%= label_tag 'feature_2_false', '非表示' %>
+    </td>
+  </tr>
+</table>
+<%- end -%>
+
+<%- if @item.name == 'list_style' -%>
+<table class="show">
+  <tr>
+    <th>タグ</th>
+    <td><%= select_tag :wrapper_tag, options_for_select(GpArticle::Content::Doc::WRAPPER_TAG_OPTIONS, @item.extra_values[:wrapper_tag]) %></td>
   </tr>
 </table>
 <%- end -%>

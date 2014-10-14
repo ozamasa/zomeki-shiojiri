@@ -16,13 +16,17 @@ class Tool::ConvertDoc < ActiveRecord::Base
     @latest_doc = docable_type.constantize.where(name: doc_name).order('updated_at desc').first
   end
 
+  def source_uri
+    "http://#{uri_path.to_s.gsub(/.htm.html$/, '.htm')}"
+  end
+
   def self.search_with_criteria(criteria = {})
     criteria ||= {}
 
     rel = scoped
     if criteria[:keyword].present?
       words = criteria[:keyword].split(/[ 　]+/)
-      conds = [:title, :uri_path, :doc_name, :doc_public_uri].map do |field|
+      conds = [:title, :uri_path, :doc_name, :doc_public_uri, :body].map do |field|
         words.map{|w| arel_table[field].matches("%#{w}%")}.inject(&:and)
       end
       rel = rel.where(conds.inject(&:or))

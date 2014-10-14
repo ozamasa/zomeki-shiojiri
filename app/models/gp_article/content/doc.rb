@@ -10,6 +10,9 @@ class GpArticle::Content::Doc < Cms::Content
   SNS_SHARE_RELATION_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
   BLOG_FUNCTIONS_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
   BROKEN_LINK_NOTIFICATION_OPTIONS = [['通知する', 'enabled'], ['通知しない', 'disabled']]
+  FEATURE_SETTINGS_OPTIONS = [['使用する', 'enabled'], ['使用しない', 'disabled']]
+  WRAPPER_TAG_OPTIONS = [['li', 'li'], ['article', 'article']]
+  DOC_LIST_STYLE_OPTIONS = [['日付毎', 'by_date'], ['記事一覧', 'simple']]
 
   default_scope { where(model: 'GpArticle::Doc') }
 
@@ -273,10 +276,31 @@ class GpArticle::Content::Doc < Cms::Content
     PortalGroup::Content::Group.find_by_id(group_id)
   end
 
+  def feature_settings_enabled?
+    setting_value(:feature_settings) == 'enabled'
+  end
+
+  def feature_settings
+    {feature_1: setting_extra_value(:feature_settings, :feature_1) != 'false',
+     feature_2: setting_extra_value(:feature_settings, :feature_2) != 'false'}
+  end
+
+  def wrapper_tag
+    setting_extra_value(:list_style, :wrapper_tag) || WRAPPER_TAG_OPTIONS.first.last
+  end
+
+  def doc_list_style
+    setting_value(:doc_list_style).to_s
+  end
+
+  def rel_docs_style
+    setting_value(:rel_docs_style).to_s
+  end
+
   private
 
   def set_default_settings
-    in_settings[:list_style] = '@title@(@publish_date@ @group@)' unless setting_value(:list_style)
+    in_settings[:list_style] = '@title_link@(@publish_date@ @group@)' unless setting_value(:list_style)
     in_settings[:date_style] = '%Y年%m月%d日 %H時%M分' unless setting_value(:date_style)
     in_settings[:time_style] = '%H時%M分' unless setting_value(:time_style)
     in_settings[:display_dates] = ['published_at'] unless setting_value(:display_dates)
@@ -289,5 +313,7 @@ class GpArticle::Content::Doc < Cms::Content
     in_settings[:sns_share_relation] = SNS_SHARE_RELATION_OPTIONS.first.last unless setting_value(:sns_share_relation)
     in_settings[:blog_functions] = BLOG_FUNCTIONS_OPTIONS.last.last unless setting_value(:blog_functions)
     in_settings[:broken_link_notification] = BROKEN_LINK_NOTIFICATION_OPTIONS.first.last unless setting_value(:broken_link_notification)
+    in_settings[:feature_settings] = FEATURE_SETTINGS_OPTIONS.last.last unless setting_value(:feature_settings)
+    in_settings[:doc_list_style] = DOC_LIST_STYLE_OPTIONS.first.last unless setting_value(:doc_list_style)
   end
 end

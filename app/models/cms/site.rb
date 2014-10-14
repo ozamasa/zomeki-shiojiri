@@ -28,7 +28,7 @@ class Cms::Site < ActiveRecord::Base
     :class_name => 'Cms::SiteBasicAuthUser'
   has_many :site_belongings, :dependent => :destroy, :class_name => 'Cms::SiteBelonging'
   has_many :groups, :through => :site_belongings, :class_name => 'Sys::Group'
-  has_many :nodes
+  has_many :nodes, :dependent => :destroy
 
   validates_presence_of :state, :name, :full_uri
   validates_uniqueness_of :full_uri
@@ -52,6 +52,11 @@ class Cms::Site < ActiveRecord::Base
 
   def portal_group_states
     [['表示','visible'],['非表示','hidden']]
+  end
+
+  def root_path
+    dir = format('%08d', id).sub(/(..)(..)(..)(..)/, '\\1/\\2/\\3/\\4')
+    Rails.root.join("sites/#{dir}")
   end
 
   def public_path
@@ -85,6 +90,13 @@ class Cms::Site < ActiveRecord::Base
 
   def publish_uri
     "#{Core.full_uri}_publish/#{format('%08d', id)}/"
+  end
+
+  def full_ssl_uri
+    return nil unless Sys::Setting.use_common_ssl?
+    url  = Sys::Setting.setting_extra_value(:common_ssl, :common_ssl_uri)
+    url += "_ssl/#{format('%08d', id)}/"
+    return url
   end
 
   def has_mobile?

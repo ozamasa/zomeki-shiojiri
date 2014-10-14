@@ -37,6 +37,7 @@ class Tool::Convert::LinkProcessor
         @clinks << clink
         e[clink.attr] = clink.after_url
         e['class'] = "iconFile icon#{clink.ext.capitalize}" if clink.tag == 'a' && clink.filename.present?
+        e['onclick'] = e['onclick'].to_s.dup.gsub(clink.url, clink.after_url)
       end
     end
 
@@ -72,19 +73,8 @@ private
   end
 
   def normalize_url(url, uri_path)
-    uri = URI.parse(url)
-    uri.scheme ||= 'http'
-    uri.host ||= uri_path.split('/')[0]
-
-    if uri.path
-      if !uri.path.include?('/') && !uri.fragment
-        uri.path = "/#{uri_path.split('/')[1...-1].join('/')}/#{uri.path}"
-      end
-      uri.path = uri.path.gsub(/[\/]+/, '/')
-    else
-      uri.path = '/'
-    end
-
+    uri = URI.parse("http://#{uri_path}").merge(url)
+    uri.path = '/' unless uri.path
     uri
   rescue => e
     nil
@@ -98,21 +88,28 @@ private
       linked_cdoc = Tool::ConvertDoc.where(uri_path: "#{uri.host}#{uri.path}index.html").first
     end
     # 他記事へのリンク(.html補完)
-    if !linked_cdoc && !uri.path.include?('.')
+    if !linked_cdoc && (!uri.path.include?('.') || uri.path[-4..-1] == '.htm' )
       linked_cdoc = Tool::ConvertDoc.where(uri_path: "#{uri.host}#{uri.path}.html").first
     end
 
+    uri = uri.dup
+    uri.scheme = uri.host = nil
+
     if linked_cdoc
-      clink.after_url = linked_cdoc.doc_public_uri
-      clink.after_url += '#' + uri.fragment if uri.fragment
+      uri.path = ""
+      if linked_cdoc == clink.cdoc
+        clink.after_url = uri.to_s
+      else
+        clink.after_url = linked_cdoc.doc_public_uri
+        clink.after_url += uri.to_s
+      end
     else
-      uri.scheme = uri.host = nil
       clink.after_url = uri.to_s
     end
   end
 
   def convert_file_link(uri, clink)
-    file_path = "#{Tool::Convert::SITE_BASE_DIR}#{uri.to_s.gsub(%r{^\w+://}, '')}"
+    file_path = "#{Tool::Convert::SITE_BASE_DIR}#{URI.unescape(uri.to_s).gsub(%r{^\w+://}, '')}"
 
     if File.file?(file_path)
       clink.file_path = file_path

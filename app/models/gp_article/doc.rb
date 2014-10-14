@@ -223,12 +223,12 @@ class GpArticle::Doc < ActiveRecord::Base
   end
 
   def public_path
-    return '' unless public_uri
+    return '' if public_uri.blank?
     "#{content.public_path}#{public_uri}#{filename_base}.html"
   end
 
   def public_smart_phone_path
-    return '' unless public_uri
+    return '' if public_uri.blank?
     "#{content.public_path}/_smartphone#{public_uri}#{filename_base}.html"
   end
 
@@ -315,8 +315,12 @@ class GpArticle::Doc < ActiveRecord::Base
     return true if will_replace?
     return false unless super
     publishers.destroy_all unless publishers.empty?
-    FileUtils.rm_rf(::File.dirname(public_path))
-    FileUtils.rm_rf(::File.dirname(public_smart_phone_path))
+    if p = public_path
+      FileUtils.rm_rf(::File.dirname(public_path)) unless p.blank?
+    end
+    if p = public_smart_phone_path
+      FileUtils.rm_rf(::File.dirname(public_smart_phone_path)) unless p.blank?
+    end
     return true
   end
 
@@ -774,8 +778,8 @@ class GpArticle::Doc < ActiveRecord::Base
     self.terminal_mobile            = true if self.has_attribute?(:terminal_mobile) && self.terminal_mobile.nil?
     self.share_to_sns_with ||= SHARE_TO_SNS_WITH_OPTIONS.first.last if self.has_attribute?(:share_to_sns_with)
     self.body_more_link_text ||= '続きを読む' if self.has_attribute?(:body_more_link_text)
-    self.feature_1 = FEATURE_1_OPTIONS.first.last if self.has_attribute?(:feature_1) && self.feature_1.nil?
-    self.feature_2 = FEATURE_2_OPTIONS.first.last if self.has_attribute?(:feature_2) && self.feature_2.nil?
+    self.feature_1 = content.feature_settings[:feature_1] if self.has_attribute?(:feature_1) && self.feature_1.nil? && content
+    self.feature_2 = content.feature_settings[:feature_2] if self.has_attribute?(:feature_2) && self.feature_2.nil? && content
     self.filename_base = 'index' if self.has_attribute?(:filename_base) && self.filename_base.nil?
   end
 
@@ -818,8 +822,8 @@ class GpArticle::Doc < ActiveRecord::Base
   end
 
   def make_file_contents_path_relative
-    self.body = self.body.gsub(%r|"[^"]*?/(file_contents/)|, '"\1') if self.body.present?
-    self.mobile_body = self.mobile_body.gsub(%r|"[^"]*?/(file_contents/)|, '"\1') if self.mobile_body.present?
+    self.body = self.body.gsub(%r!("|')[^"'(]*?/(file_contents/)!, '\1\2') if self.body.present?
+    self.mobile_body = self.mobile_body.gsub(%r!("|')[^"'(]*?/(file_contents/)!, '\1\2') if self.mobile_body.present?
   end
 
   def event_dates_range

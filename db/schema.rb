@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140724072750) do
+ActiveRecord::Schema.define(:version => 20141008043119) do
 
   create_table "ad_banner_banners", :force => true do |t|
     t.string   "name"
@@ -933,6 +933,8 @@ ActiveRecord::Schema.define(:version => 20140724072750) do
     t.integer  "num_docs"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
+    t.text     "upper_text"
+    t.text     "lower_text"
   end
 
   add_index "gp_category_template_modules", ["content_id"], :name => "index_gp_category_template_modules_on_content_id"
@@ -1669,6 +1671,15 @@ ActiveRecord::Schema.define(:version => 20140724072750) do
 
   add_index "sys_sequences", ["name", "version"], :name => "index_sys_sequences_on_name_and_version", :unique => true
 
+  create_table "sys_settings", :force => true do |t|
+    t.string   "name"
+    t.text     "value"
+    t.integer  "sort_no"
+    t.text     "extra_value"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "sys_tasks", :force => true do |t|
     t.integer  "unid"
     t.datetime "created_at"
@@ -1820,10 +1831,11 @@ ActiveRecord::Schema.define(:version => 20140724072750) do
     t.text     "include_dir"
     t.datetime "start_at"
     t.datetime "end_at"
+    t.integer  "recursive_level"
     t.string   "remark"
     t.text     "message"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "tool_convert_imports", :force => true do |t|
@@ -1832,6 +1844,7 @@ ActiveRecord::Schema.define(:version => 20140724072750) do
     t.string   "site_filename"
     t.integer  "content_id"
     t.integer  "overwrite"
+    t.integer  "keep_filename"
     t.datetime "start_at"
     t.datetime "end_at"
     t.text     "message"
@@ -1864,6 +1877,10 @@ ActiveRecord::Schema.define(:version => 20140724072750) do
     t.text     "updated_at_tag"
     t.text     "updated_at_regexp"
     t.text     "creator_group_from_url_regexp"
+    t.integer  "creator_group_relation_type"
+    t.text     "creator_group_url_relations"
+    t.text     "category_tag"
+    t.text     "category_regexp"
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
   end

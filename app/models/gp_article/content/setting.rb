@@ -14,8 +14,12 @@ class GpArticle::Content::Setting < Cms::ContentSetting
     comment: '（例 gif,jpg,png,pdf,doc,xls,ppt,odt,ods,odp ）'
   set_config :word_dictionary, name: "本文/単語変換辞書",
     form_type: :text, lower_text: "CSV形式（例　対象文字,変換後文字 ）"
+  set_config :doc_list_style, name: "#{GpArticle::Doc.model_name.human}一覧表示形式",
+    options: GpArticle::Content::Doc::DOC_LIST_STYLE_OPTIONS
   set_config :list_style, name: "#{GpArticle::Doc.model_name.human}表示形式",
-    form_type: :text_area, comment_upper: I18n.t('comments.doc_style').html_safe
+    form_type: :text_area, comment_upper: 'doc_style_tags'
+  set_config :rel_docs_style, name: "関連#{GpArticle::Doc.model_name.human}表示形式",
+    form_type: :text_area, comment_upper: 'doc_style_tags'
   set_config :date_style, name: "#{GpArticle::Doc.model_name.human}日付形式",
     comment: I18n.t('comments.date_style').html_safe
   set_config :time_style, name: "#{GpArticle::Doc.model_name.human}時間形式",
@@ -56,6 +60,9 @@ class GpArticle::Content::Setting < Cms::ContentSetting
     options: lambda { Organization::Content::Group.where(site_id: Core.site.id).map{|g| [g.name, g.id] } }
   set_config :broken_link_notification, name: 'リンク切れ通知',
     options: GpArticle::Content::Doc::BROKEN_LINK_NOTIFICATION_OPTIONS,
+    form_type: :radio_buttons
+  set_config :feature_settings, name: '記事表示設定',
+    options: GpArticle::Content::Doc::FEATURE_SETTINGS_OPTIONS,
     form_type: :radio_buttons
 
   after_initialize :set_defaults

@@ -4,7 +4,7 @@ class Cms::Admin::Tool::ConvertDocsController < Cms::Controller::Admin::Base
   include Sys::Controller::Scaffold::Base
 
   def pre_dispatch
-    return error_auth unless Core.user.root?
+    return error_auth unless Core.user.has_auth?(:manager)
     return redirect_to(request.env['PATH_INFO']) if params[:reset]
     @item = Tool::ConvertDoc.find(params[:id]) if params[:id].present?
   end
@@ -40,7 +40,7 @@ class Cms::Admin::Tool::ConvertDocsController < Cms::Controller::Admin::Base
              Tool::ConvertDoc.human_attribute_name(:updated_at)]
       @items.find_each do |item|
         org_uri = "/#{@org_node_name}/#{item.page_group_code}/#{item.doc_name}/"
-        csv << [item.uri_path, org_uri, item.doc_public_uri, item.title, item.published_at.try(:strftime, '%Y/%m/%d %H:%M:%S'), item.updated_at.try(:strftime, '%Y/%m/%d %H:%M:%S')]
+        csv << [item.source_uri, org_uri, item.doc_public_uri, item.title, item.published_at.try(:strftime, '%Y/%m/%d %H:%M:%S'), item.updated_at.try(:strftime, '%Y/%m/%d %H:%M:%S')]
       end
     end
 

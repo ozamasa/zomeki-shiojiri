@@ -7,7 +7,9 @@
     </tr>
     <tr>
       <th><%= @item.locale(:site_filename) %></th>
-      <td><%= f.select :site_filename, @item.site_filename_options, { include_blank: true } %></td>
+      <td><%= select_tag 'item[site_filename]', options_for_select(@item.site_filename_options),
+                id: 'item_site_filename', include_blank: true, multiple: true, size: 10 %>
+    </td>
     </tr>
     <tr>
       <th><%= @item.locale(:content_id) %></th>
@@ -16,6 +18,10 @@
     <tr>
       <th><%= @item.locale(:overwrite) %></th>
       <td><%= f.radio_buttons :overwrite, @item.class::OVERWRITE_OPTIONS %></td>
+    </tr>
+    <tr>
+      <th><%= @item.locale(:keep_filename) %></th>
+      <td><%= f.radio_buttons :keep_filename, @item.class::KEEP_FILENAME_OPTIONS %></td>
     </tr>
   </table>
   <%= submit "書き込む" %>

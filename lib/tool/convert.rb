@@ -4,8 +4,9 @@ class Tool::Convert
 
   def self.download_site(conf)
     return if conf.site_url.blank?
-    com = "wget -rqNE -P #{SITE_BASE_DIR} #{conf.site_url}"
+    com = "wget -rqNE --restrict-file-names=nocontrol -P #{SITE_BASE_DIR} #{conf.site_url}"
     com << " -I #{conf.include_dir}" if conf.include_dir.present?
+    com << " -l #{conf.recursive_level}" if conf.recursive_level
     system com
   end
 
@@ -14,8 +15,13 @@ class Tool::Convert
   end
 
   def self.child_dirs(dir)
+    return [] if !::File.exist?(dir)
     dirs = [dir]
     Dir::entries(dir).sort.each do |name|
+      unless name.valid_encoding?
+        dump "#{name} :: directory name encode error.."
+        next
+      end
       next if name =~ /^\.+/ || ::FileTest.file?(File.join(dir, name))
       dirs += child_dirs(File.join(dir, name))
     end
@@ -84,7 +90,7 @@ class Tool::Convert
         dump "#{db.process_type_label},#{db.cdoc.class.name},#{db.cdoc.id},#{db.cdoc.docable_type},#{db.cdoc.docable_id}"
       else
         conf.skipped_num += 1
-        dump "非記事"
+        dump "非記事（#{'タイトル' if page.title.blank?}#{'本文' if page.body.blank?}無し）"
       end
 
       conf.save if i % 100 == 0
