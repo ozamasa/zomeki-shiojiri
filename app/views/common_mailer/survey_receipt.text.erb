@@ -1,8 +1,11 @@
-「<%= @form_answer.form.title %>」に問い合わせがありました。
+「<%= @form_answer.form.content.name %>：<%= @form_answer.form.title %>」に回答が届きました。
 
-<%- @form_answer.answers.each do |answer| -%>
-<%= "#{answer.question.title}：#{answer.content}" %>
-<%- end -%>
-<%= "#{@form_answer.class.human_attribute_name :created_at}：#{l @form_answer.created_at}" %>
+<% @form_answer.form.questions.where("form_type <> 'free'").each_with_index do |question, index| %>
+■<%= question.title %>
+<%= @form_answer.answers.where(question_id: question.id).first.try(:content) %>
 
-<%= "#{URI.parse(@form_answer.answered_url).scheme}://#{URI.parse(@form_answer.answered_url).host}#{survey_form_form_answers_path(content: @form_answer.form.content, form_id: @form_answer.form.id)}/#{@form_answer.id}" %>
+<% end %>
+<% if false %>
+  次のURLをクリックして回答を確認してください。
+  <%= @form_answer.form.content.site.full_uri.sub(/\/\z/, '') %><%= survey_form_form_answers_path(content: @form_answer.form.content, form_id: @form_answer.form.id) %>
+<% end %>

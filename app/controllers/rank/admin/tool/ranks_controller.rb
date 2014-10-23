@@ -1,6 +1,6 @@
-class GpCategory::Admin::Tool::CategoryTypesController < Cms::Controller::Admin::Base
+class Rank::Admin::Tool::RanksController < Cms::Controller::Admin::Base
   def rebuild
-    content = GpCategory::Content::CategoryType.find(params[:content_id])
+    content = Rank::Content::Rank.find(params[:content_id])
 
     results = {ok: 0, ng: 0}
     errors = []
